@@ -1,8 +1,8 @@
 const CACHE_NAME = 'lifeoptima-v1';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json',
+  './',
+  './index.html',
+  './manifest.json',
   'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap'
 ];
 
@@ -71,8 +71,8 @@ function doBackgroundSync() {
 self.addEventListener('push', event => {
   const options = {
     body: event.data ? event.data.text() : 'Erinnerung von LifeOptima',
-    icon: '/icon-192x192.png',
-    badge: '/icon-192x192.png',
+    icon: './icon-192x192.png',
+    badge: './icon-192x192.png',
     vibrate: [200, 100, 200],
     data: {
       dateOfArrival: Date.now(),
@@ -82,7 +82,7 @@ self.addEventListener('push', event => {
       {
         action: 'explore',
         title: 'App öffnen',
-        icon: '/icon-192x192.png'
+        icon: './icon-192x192.png'
       },
       {
         action: 'close',
@@ -102,7 +102,7 @@ self.addEventListener('notificationclick', event => {
 
   if (event.action === 'explore') {
     event.waitUntil(
-      clients.openWindow('/')
+      clients.openWindow('./')
     );
   }
 });
@@ -121,7 +121,7 @@ function checkTimerStatus() {
     if (timerData.shouldNotify) {
       self.registration.showNotification('Timer abgelaufen!', {
         body: '90 Minuten sind vorbei. Zeit für eine Pause!',
-        icon: '/icon-192x192.png',
+        icon: './icon-192x192.png',
         tag: 'timer-notification'
       });
     }

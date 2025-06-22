@@ -2099,7 +2099,7 @@
 
             // Setup service worker for PWA
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('/sw.js')
+                navigator.serviceWorker.register('./sw.js')
                     .then(registration => {
                         console.log('Service Worker registered successfully:', registration);
                         
@@ -2321,7 +2321,7 @@
                         if ('Notification' in window && Notification.permission === 'granted') {
                             new Notification('LifeOptima Timer', {
                                 body: '90 Minuten sind vorbei! Zeit für eine Pause.',
-                                icon: '/icon-192x192.png',
+                                icon: './icon-192x192.png',
                                 tag: 'timer-complete',
                                 requireInteraction: true,
                                 vibrate: [200, 100, 200]
@@ -2760,7 +2760,7 @@
             if (AppState.notifications && 'Notification' in window && Notification.permission === 'granted') {
                 new Notification('LifeOptima', {
                     body: message,
-                    icon: '/icon-192x192.png'
+                    icon: './icon-192x192.png'
                 });
             }
         }
