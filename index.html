@@ -1,0 +1,2343 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LifeOptima - Gesundheitsoptimierung</title>
+    <meta name="description" content="Wissenschaftlich fundierte Gesundheitsoptimierung">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        #app {
+            position: relative;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        /* Loading Screen */
+        #loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-content {
+            text-align: center;
+            color: white;
+        }
+
+        .logo {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: bounce 2s infinite;
+        }
+
+        .loading-content h1 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            font-weight: 700;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        /* Screens */
+        .screen {
+            display: none;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Headers */
+        .screen-header {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .screen-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2563eb;
+        }
+
+        .streak-display {
+            background: #10b981;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* Content */
+        .content {
+            display: grid;
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+
+        .card h2 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #1f2937;
+        }
+
+        /* Water Tracking */
+        .water-progress {
+            text-align: center;
+        }
+
+        .water-amount {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2563eb;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: #e5e7eb;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+            transition: width 0.3s ease;
+            border-radius: 6px;
+        }
+
+        .water-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-water {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-water:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        .btn-water:active {
+            transform: translateY(0);
+        }
+
+        /* Timer */
+        .timer-display {
+            text-align: center;
+        }
+
+        #timer-time {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 20px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+            transform: translateY(-1px);
+        }
+
+                 /* Health Tip */
+         .daily-tip-badge {
+             background: #10b981;
+             color: white;
+             padding: 6px 12px;
+             border-radius: 15px;
+             font-size: 0.8rem;
+             font-weight: 600;
+             text-align: center;
+             margin-bottom: 10px;
+             width: fit-content;
+             animation: pulse 2s infinite;
+         }
+
+         @keyframes pulse {
+             0% { transform: scale(1); }
+             50% { transform: scale(1.05); }
+             100% { transform: scale(1); }
+         }
+
+         .tip-container {
+             display: grid;
+             gap: 15px;
+         }
+
+         .health-tip {
+             background: #f0f9ff;
+             border: 2px solid #3b82f6;
+             border-radius: 12px;
+             padding: 20px;
+             font-style: italic;
+             color: #1e40af;
+             line-height: 1.6;
+             font-size: 1rem;
+             min-height: 80px;
+             display: flex;
+             align-items: center;
+         }
+
+         .tip-controls {
+             display: flex;
+             justify-content: space-between;
+             align-items: center;
+             flex-wrap: wrap;
+             gap: 10px;
+         }
+
+         .tip-counter {
+             background: #e5e7eb;
+             padding: 8px 12px;
+             border-radius: 20px;
+             font-weight: 600;
+             color: #374151;
+             font-size: 0.9rem;
+         }
+
+         .tip-buttons {
+             display: flex;
+             gap: 8px;
+             flex-wrap: wrap;
+         }
+
+         .btn-tip {
+             background: #3b82f6;
+             color: white;
+             border: none;
+             padding: 8px 16px;
+             border-radius: 20px;
+             font-weight: 500;
+             cursor: pointer;
+             transition: all 0.2s ease;
+             font-size: 0.85rem;
+             min-width: 100px;
+         }
+
+         .btn-tip:hover:not(:disabled) {
+             background: #2563eb;
+             transform: translateY(-1px);
+         }
+
+         .btn-tip:disabled {
+             opacity: 0.5;
+             cursor: not-allowed;
+         }
+
+         .btn-tip:active {
+             transform: translateY(0);
+         }
+
+         .btn-tip-daily {
+             background: #10b981;
+         }
+
+         .btn-tip-daily:hover:not(:disabled) {
+             background: #059669;
+         }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-radius: 12px;
+            min-width: 60px;
+        }
+
+        .nav-btn:hover {
+            background: #f3f4f6;
+        }
+
+        .nav-btn.active {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .nav-btn.active .nav-icon {
+            transform: scale(1.1);
+        }
+
+        .nav-icon {
+            font-size: 1.5rem;
+            margin-bottom: 4px;
+            transition: transform 0.2s ease;
+        }
+
+        .nav-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+                 /* Schedule */
+         .schedule-controls {
+             display: flex;
+             justify-content: space-between;
+             align-items: center;
+             flex-wrap: wrap;
+             gap: 10px;
+         }
+
+         .schedule-date {
+             color: #6b7280;
+             font-weight: 500;
+         }
+
+        .schedule-timeline {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .schedule-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .schedule-item:last-child {
+            border-bottom: none;
+        }
+
+        .schedule-time {
+            width: 80px;
+            font-weight: 600;
+            color: #2563eb;
+            font-size: 0.9rem;
+        }
+
+        .schedule-activity {
+            flex: 1;
+            margin-left: 15px;
+        }
+
+        .schedule-activity h4 {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .schedule-activity p {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+                 .focus-phase {
+             background: #fef3c7;
+             border-left: 4px solid #f59e0b;
+             padding-left: 15px;
+             margin-left: -15px;
+         }
+
+         /* Schedule Edit Mode */
+         .schedule-item.edit-mode {
+             background: #f8fafc;
+             border: 2px solid #e2e8f0;
+             padding: 15px;
+             margin-bottom: 15px;
+         }
+
+         .schedule-edit-controls {
+             display: flex;
+             justify-content: space-between;
+             align-items: center;
+             margin-bottom: 15px;
+         }
+
+         .edit-time {
+             padding: 8px 12px;
+             border: 2px solid #e2e8f0;
+             border-radius: 6px;
+             font-weight: 600;
+             color: #2563eb;
+             font-size: 0.9rem;
+         }
+
+         .btn-delete {
+             background: #dc2626;
+             color: white;
+             border: none;
+             padding: 8px 12px;
+             border-radius: 6px;
+             cursor: pointer;
+         }
+
+         .btn-delete:hover {
+             background: #b91c1c;
+         }
+
+         .schedule-edit-content {
+             display: grid;
+             gap: 10px;
+         }
+
+         .edit-activity {
+             padding: 10px;
+             border: 2px solid #e2e8f0;
+             border-radius: 6px;
+             font-weight: 600;
+             font-size: 1rem;
+         }
+
+         .edit-description {
+             padding: 10px;
+             border: 2px solid #e2e8f0;
+             border-radius: 6px;
+             resize: vertical;
+             min-height: 60px;
+             font-family: inherit;
+         }
+
+         .schedule-options {
+             display: flex;
+             gap: 20px;
+             align-items: center;
+         }
+
+         .schedule-options label {
+             display: flex;
+             align-items: center;
+             gap: 8px;
+             font-weight: 500;
+             cursor: pointer;
+         }
+
+         .schedule-options input[type="checkbox"] {
+             width: 16px;
+             height: 16px;
+         }
+
+         .notification-indicator {
+             color: #059669;
+             font-size: 0.8rem;
+             font-weight: 500;
+             margin-top: 5px;
+         }
+
+        /* Supplements */
+        .supplement-filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .filter-btn {
+            background: #f3f4f6;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .filter-btn:hover {
+            background: #e5e7eb;
+        }
+
+        .filter-btn.active {
+            background: #2563eb;
+            color: white;
+        }
+
+        .supplements-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .supplement-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+        }
+
+        .supplement-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .supplement-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .supplement-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #1f2937;
+        }
+
+        .supplement-category {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .supplement-description {
+            color: #6b7280;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .supplement-dosage {
+            font-weight: 500;
+            color: #059669;
+            margin-bottom: 10px;
+        }
+
+                 .supplement-actions {
+             display: flex;
+             gap: 10px;
+         }
+
+         .supplement-importance {
+             font-weight: 600;
+             font-size: 0.9rem;
+             margin-bottom: 10px;
+             padding: 8px 12px;
+             border-radius: 8px;
+             background: #f8fafc;
+         }
+
+         .supplement-evidence {
+             font-size: 0.9rem;
+             color: #6b7280;
+             margin-bottom: 15px;
+         }
+
+         /* Priority styling */
+         .priority-1 {
+             border-left: 4px solid #dc2626;
+         }
+
+         .priority-1 .supplement-importance {
+             background: #fef2f2;
+             color: #dc2626;
+         }
+
+         .priority-2 {
+             border-left: 4px solid #ea580c;
+         }
+
+         .priority-2 .supplement-importance {
+             background: #fff7ed;
+             color: #ea580c;
+         }
+
+         .priority-3 {
+             border-left: 4px solid #ca8a04;
+         }
+
+         .priority-3 .supplement-importance {
+             background: #fefce8;
+             color: #ca8a04;
+         }
+
+         .priority-4 {
+             border-left: 4px solid #059669;
+         }
+
+         .priority-4 .supplement-importance {
+             background: #ecfdf5;
+             color: #059669;
+         }
+
+         .filter-btn.priority {
+             font-size: 0.8rem;
+             padding: 6px 12px;
+         }
+
+        .btn-add {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.8rem;
+        }
+
+        .btn-add:hover {
+            background: #059669;
+        }
+
+        .btn-add.added {
+            background: #6b7280;
+        }
+
+        /* Progress */
+        .progress-tabs {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .tab-btn {
+            background: #f3f4f6;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            background: #e5e7eb;
+        }
+
+        .tab-btn.active {
+            background: #2563eb;
+            color: white;
+        }
+
+        .tab-content {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .daily-input h3 {
+            margin-bottom: 20px;
+            color: #1f2937;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .input-group input[type="range"] {
+            width: 100%;
+            margin-bottom: 8px;
+        }
+
+        .input-group input[type="text"],
+        .input-group input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s ease;
+        }
+
+        .input-group input[type="text"]:focus,
+        .input-group input[type="number"]:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        /* Profile */
+        .profile-form {
+            display: grid;
+            gap: 15px;
+        }
+
+        .bmi-display {
+            background: #f0f9ff;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.1rem;
+            color: #1e40af;
+        }
+
+        .goals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .goal-card {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .goal-card:hover {
+            border-color: #2563eb;
+            background: #f0f9ff;
+        }
+
+        .goal-card.active {
+            border-color: #10b981;
+            background: #ecfdf5;
+        }
+
+        .goal-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .goal-title {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .settings-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+                 .setting-item:last-child {
+             border-bottom: none;
+         }
+
+         /* Additional CSS for dynamic content */
+         .weekly-summary {
+             background: #f9fafb;
+             border-radius: 12px;
+             padding: 20px;
+         }
+
+         .stat-item {
+             display: flex;
+             justify-content: space-between;
+             padding: 10px 0;
+             border-bottom: 1px solid #e5e7eb;
+         }
+
+         .stat-item:last-child {
+             border-bottom: none;
+         }
+
+         .insight-item {
+             background: #f0f9ff;
+             border: 1px solid #bfdbfe;
+             border-radius: 12px;
+             padding: 15px;
+             margin-bottom: 15px;
+         }
+
+         .insight-item h4 {
+             color: #1e40af;
+             margin-bottom: 8px;
+         }
+
+         .insight-item p {
+             color: #374151;
+             line-height: 1.5;
+         }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .screen {
+                padding: 15px;
+            }
+
+            .screen-header {
+                padding: 15px;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .screen-header h1 {
+                font-size: 1.5rem;
+            }
+
+            #timer-time {
+                font-size: 2.5rem;
+            }
+
+            .timer-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .water-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn-water {
+                width: 100%;
+                max-width: 200px;
+            }
+
+            .supplement-filters {
+                justify-content: center;
+            }
+
+            .progress-tabs {
+                justify-content: center;
+            }
+
+                         .goals-grid {
+                 grid-template-columns: 1fr;
+             }
+
+             .schedule-controls {
+                 flex-direction: column;
+                 align-items: stretch;
+             }
+
+             .schedule-options {
+                 flex-direction: column;
+                 gap: 10px;
+                 align-items: flex-start;
+             }
+
+             .tip-controls {
+                 flex-direction: column;
+                 align-items: stretch;
+             }
+
+             .tip-buttons {
+                 justify-content: center;
+             }
+
+             .btn-tip {
+                 flex: 1;
+                 min-width: 80px;
+             }
+         }
+
+        @media (max-width: 480px) {
+            .nav-label {
+                display: none;
+            }
+
+            .nav-btn {
+                min-width: 50px;
+            }
+
+            .card {
+                padding: 15px;
+            }
+
+            .loading-content h1 {
+                font-size: 2rem;
+            }
+
+            .logo {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Loading Screen -->
+        <div id="loading" class="screen">
+            <div class="loading-content">
+                <div class="logo">🚀</div>
+                <h1>LifeOptima</h1>
+                <div class="loading-spinner"></div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav id="bottom-nav" class="bottom-nav hidden">
+            <button class="nav-btn active" data-screen="home">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Home</span>
+            </button>
+            <button class="nav-btn" data-screen="schedule">
+                <span class="nav-icon">🕒</span>
+                <span class="nav-label">Schedule</span>
+            </button>
+            <button class="nav-btn" data-screen="supplements">
+                <span class="nav-icon">💊</span>
+                <span class="nav-label">Supplements</span>
+            </button>
+            <button class="nav-btn" data-screen="progress">
+                <span class="nav-icon">📊</span>
+                <span class="nav-label">Progress</span>
+            </button>
+            <button class="nav-btn" data-screen="profile">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">Profile</span>
+            </button>
+        </nav>
+
+        <!-- Home Screen -->
+        <div id="home" class="screen hidden">
+            <header class="screen-header">
+                <h1>🏠 Home</h1>
+                <div class="streak-display">
+                    <span id="current-streak">0</span> Tage Streak
+                </div>
+            </header>
+            
+            <div class="content">
+                <!-- Water Tracking -->
+                <div class="card">
+                    <h2>💧 Wasser Tracking</h2>
+                    <div class="water-progress">
+                        <div class="water-amount">
+                            <span id="water-current">0</span> / <span id="water-target">2500</span> ml
+                        </div>
+                        <div class="progress-bar">
+                            <div id="water-progress" class="progress-fill"></div>
+                        </div>
+                        <div class="water-buttons">
+                            <button class="btn-water" data-amount="250">250ml</button>
+                            <button class="btn-water" data-amount="500">500ml</button>
+                            <button class="btn-water" data-amount="750">750ml</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 90-Min Timer -->
+                <div class="card">
+                    <h2>⏱️ 90-Min Focus Timer</h2>
+                    <div class="timer-display">
+                        <div id="timer-time">90:00</div>
+                        <div class="timer-controls">
+                            <button id="timer-start" class="btn-primary">Start</button>
+                            <button id="timer-pause" class="btn-secondary hidden">Pause</button>
+                            <button id="timer-reset" class="btn-secondary">Reset</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Health Tips -->
+                <div class="card">
+                    <h2>💡 Gesundheitstipps</h2>
+                    <div id="daily-tip-badge" class="daily-tip-badge">📅 Tipp des Tages</div>
+                    <div class="tip-container">
+                        <div id="daily-tip" class="health-tip">
+                            Trinke direkt nach dem Aufwachen 500ml Wasser, um den Stoffwechsel anzukurbeln.
+                        </div>
+                        <div class="tip-controls">
+                            <div class="tip-counter">
+                                <span id="tip-current">1</span> / <span id="tip-total">48</span>
+                            </div>
+                            <div class="tip-buttons">
+                                <button id="prev-tip" class="btn-tip">⬅️ Vorheriger</button>
+                                <button id="next-tip" class="btn-tip">Nächster ➡️</button>
+                                <button id="daily-tip-btn" class="btn-tip btn-tip-daily">📅 Heute</button>
+                                <button id="random-tip" class="btn-tip">🎲 Zufällig</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Schedule Screen -->
+        <div id="schedule" class="screen hidden">
+            <header class="screen-header">
+                <h1>🕒 Tagesplan</h1>
+                <div class="schedule-controls">
+                    <div class="schedule-date" id="schedule-date"></div>
+                    <button id="edit-schedule" class="btn-secondary">✏️ Bearbeiten</button>
+                    <button id="add-schedule-item" class="btn-primary hidden">➕ Hinzufügen</button>
+                    <button id="save-schedule" class="btn-primary hidden">💾 Speichern</button>
+                    <button id="reset-schedule" class="btn-secondary hidden">🔄 Zurücksetzen</button>
+                </div>
+            </header>
+            
+            <div class="content">
+                <div class="schedule-timeline" id="schedule-timeline">
+                    <!-- Timeline wird dynamisch generiert -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Supplements Screen -->
+        <div id="supplements" class="screen hidden">
+            <header class="screen-header">
+                <h1>💊 Supplements</h1>
+                <div class="supplement-filters">
+                    <button class="filter-btn active" data-filter="all">Alle</button>
+                    <button class="filter-btn priority" data-filter="priority-1">🔴 Kritisch</button>
+                    <button class="filter-btn priority" data-filter="priority-2">🟠 Hoch</button>
+                    <button class="filter-btn priority" data-filter="priority-3">🟡 Mittel</button>
+                    <button class="filter-btn priority" data-filter="priority-4">🟢 Niedrig</button>
+                    <button class="filter-btn" data-filter="cognitive">Kognition</button>
+                    <button class="filter-btn" data-filter="performance">Performance</button>
+                    <button class="filter-btn" data-filter="recovery">Recovery</button>
+                </div>
+            </header>
+            
+            <div class="content">
+                <div id="supplements-list" class="supplements-grid">
+                    <!-- Supplements werden dynamisch generiert -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Screen -->
+        <div id="progress" class="screen hidden">
+            <header class="screen-header">
+                <h1>📊 Progress</h1>
+                <div class="progress-tabs">
+                    <button class="tab-btn active" data-tab="daily">Daily</button>
+                    <button class="tab-btn" data-tab="weekly">Weekly</button>
+                    <button class="tab-btn" data-tab="insights">Insights</button>
+                </div>
+            </header>
+            
+            <div class="content">
+                <!-- Daily Tab -->
+                <div id="daily-tab" class="tab-content">
+                    <div class="daily-input">
+                        <h3>Heutiger Status</h3>
+                        <div class="input-group">
+                            <label>Energie Level (1-10)</label>
+                            <input type="range" id="energy-level" min="1" max="10" value="5">
+                            <span id="energy-value">5</span>
+                        </div>
+                        <div class="input-group">
+                            <label>Schlafqualität (1-10)</label>
+                            <input type="range" id="sleep-quality" min="1" max="10" value="5">
+                            <span id="sleep-value">5</span>
+                        </div>
+                        <div class="input-group">
+                            <label>Stimmung (1-10)</label>
+                            <input type="range" id="mood-level" min="1" max="10" value="5">
+                            <span id="mood-value">5</span>
+                        </div>
+                        <button id="save-daily" class="btn-primary">Speichern</button>
+                    </div>
+                </div>
+
+                <!-- Weekly Tab -->
+                <div id="weekly-tab" class="tab-content hidden">
+                    <div class="weekly-stats">
+                        <h3>Wochenstatistiken</h3>
+                        <div id="weekly-charts"></div>
+                    </div>
+                </div>
+
+                <!-- Insights Tab -->
+                <div id="insights-tab" class="tab-content hidden">
+                    <div class="insights">
+                        <h3>Insights & Trends</h3>
+                        <div id="insights-content"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Screen -->
+        <div id="profile" class="screen hidden">
+            <header class="screen-header">
+                <h1>👤 Profile</h1>
+            </header>
+            
+            <div class="content">
+                <!-- Personal Data -->
+                <div class="card">
+                    <h2>Persönliche Daten</h2>
+                    <div class="profile-form">
+                        <div class="input-group">
+                            <label>Name</label>
+                            <input type="text" id="user-name" placeholder="Dein Name">
+                        </div>
+                        <div class="input-group">
+                            <label>Alter</label>
+                            <input type="number" id="user-age" placeholder="25">
+                        </div>
+                        <div class="input-group">
+                            <label>Größe (cm)</label>
+                            <input type="number" id="user-height" placeholder="175">
+                        </div>
+                        <div class="input-group">
+                            <label>Gewicht (kg)</label>
+                            <input type="number" id="user-weight" placeholder="70">
+                        </div>
+                        <div class="bmi-display">
+                            <strong>BMI: <span id="bmi-value">-</span></strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Goals -->
+                <div class="card">
+                    <h2>Ziele</h2>
+                    <div id="goals-list" class="goals-grid">
+                        <!-- Goals werden dynamisch generiert -->
+                    </div>
+                </div>
+
+                <!-- Settings -->
+                <div class="card">
+                    <h2>Einstellungen</h2>
+                    <div class="settings-list">
+                        <div class="setting-item">
+                            <label>Benachrichtigungen</label>
+                            <input type="checkbox" id="notifications-enabled" checked>
+                        </div>
+                        <button id="export-data" class="btn-secondary">Daten exportieren</button>
+                        <button id="install-app" class="btn-primary hidden">App installieren</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // App State
+        const AppState = {
+            currentScreen: 'loading',
+            waterIntake: 0,
+            waterTarget: 2500,
+            currentStreak: 0,
+            timerTime: 90 * 60, // 90 minutes in seconds
+            timerInterval: null,
+            timerRunning: false,
+            userData: {
+                name: '',
+                age: 25,
+                height: 175,
+                weight: 70,
+                goals: []
+            },
+            dailyData: {
+                energy: 5,
+                sleep: 5,
+                mood: 5
+            },
+            supplements: [],
+            mySupplements: [],
+            notifications: true,
+            customSchedule: null,
+            scheduleEditMode: false,
+            scheduleNotifications: {},
+            currentTipIndex: 0
+        };
+
+        // Scientific data
+        const SUPPLEMENTS_DATA = [
+            // HÖCHSTE PRIORITÄT (Grundversorgung)
+            {
+                name: 'Vitamin D3',
+                category: 'recovery',
+                description: 'Unterstützt Immunsystem und Knochengesundheit. Besonders wichtig bei wenig Sonnenlicht.',
+                dosage: '2000-4000 IU täglich',
+                evidence: 'Hochgradig evidenzbasiert',
+                priority: 1,
+                importance: '🔴 KRITISCH - 90% der Menschen haben Mangel'
+            },
+            {
+                name: 'Omega-3 (EPA/DHA)',
+                category: 'cognitive',
+                description: 'EPA/DHA für Gehirnfunktion und Herz-Kreislauf-Gesundheit. Reduziert Entzündungen.',
+                dosage: '1000-2000mg EPA/DHA täglich',
+                evidence: 'Hochgradig evidenzbasiert',
+                priority: 1,
+                importance: '🔴 KRITISCH - Essentiell für Gehirn & Herz'
+            },
+            {
+                name: 'Magnesium',
+                category: 'recovery',
+                description: 'Für Muskelentspannung, Schlafqualität und über 300 enzymatische Reaktionen.',
+                dosage: '200-400mg vor dem Schlafengehen',
+                evidence: 'Hochgradig evidenzbasiert',
+                priority: 1,
+                importance: '🔴 KRITISCH - 70% haben Mangel'
+            },
+            
+            // HOHE PRIORITÄT (Performance & Gesundheit)
+            {
+                name: 'Kreatin Monohydrat',
+                category: 'performance',
+                description: 'Steigert körperliche Leistung und unterstützt Muskelmasse bei kurzen, intensiven Aktivitäten.',
+                dosage: '3-5g täglich',
+                evidence: 'Hochgradig evidenzbasiert',
+                priority: 2,
+                importance: '🟠 HOCH - Beste Performance-Ergänzung'
+            },
+            {
+                name: 'Vitamin B12',
+                category: 'cognitive',
+                description: 'Essentiell für Energiestoffwechsel und Nervenfunktion. Besonders wichtig bei veganer Ernährung.',
+                dosage: '250-1000mcg täglich',
+                evidence: 'Hochgradig evidenzbasiert',
+                priority: 2,
+                importance: '🟠 HOCH - Kritisch bei veganer Ernährung'
+            },
+            {
+                name: 'Zink',
+                category: 'recovery',
+                description: 'Unterstützt Immunsystem, Wundheilung und Hormonproduktion. Wichtig für Testosteron.',
+                dosage: '8-11mg täglich mit Nahrung',
+                evidence: 'Hochgradig evidenzbasiert',
+                priority: 2,
+                importance: '🟠 HOCH - Immunsystem & Hormone'
+            },
+            {
+                name: 'Vitamin K2 (MK-7)',
+                category: 'recovery',
+                description: 'Arbeitet synergistisch mit Vitamin D3 für Knochengesundheit und Herzschutz.',
+                dosage: '100-200mcg täglich',
+                evidence: 'Gut evidenzbasiert',
+                priority: 2,
+                importance: '🟠 HOCH - Synergistisch mit Vitamin D3'
+            },
+            
+            // MITTLERE PRIORITÄT (Optimierung)
+            {
+                name: 'Ashwagandha',
+                category: 'cognitive',
+                description: 'Adaptogen zur Stressreduktion und Verbesserung der Schlafqualität.',
+                dosage: '300-600mg täglich',
+                evidence: 'Gut evidenzbasiert',
+                priority: 3,
+                importance: '🟡 MITTEL - Stressmanagement'
+            },
+            {
+                name: 'Rhodiola Rosea',
+                category: 'performance',
+                description: 'Adaptogen zur Verbesserung der mentalen Leistungsfähigkeit und Stressresistenz.',
+                dosage: '200-400mg am Morgen',
+                evidence: 'Moderat evidenzbasiert',
+                priority: 3,
+                importance: '🟡 MITTEL - Mentale Performance'
+            },
+            {
+                name: 'Curcumin (mit Piperin)',
+                category: 'recovery',
+                description: 'Potentes Antioxidans mit entzündungshemmenden Eigenschaften für Gelenke und Regeneration.',
+                dosage: '500-1000mg täglich mit Piperin',
+                evidence: 'Gut evidenzbasiert',
+                priority: 3,
+                importance: '🟡 MITTEL - Entzündungshemmung'
+            },
+            {
+                name: 'Probiotika',
+                category: 'recovery',
+                description: 'Unterstützt Darmgesundheit, Immunsystem und kann Stimmung positiv beeinflussen.',
+                dosage: '10-50 Milliarden CFU täglich',
+                evidence: 'Gut evidenzbasiert',
+                priority: 3,
+                importance: '🟡 MITTEL - Darmgesundheit'
+            },
+            {
+                name: 'Melatonin',
+                category: 'recovery',
+                description: 'Natürliches Schlafhormon zur Verbesserung der Schlafqualität und Einschlafzeit.',
+                dosage: '0.5-3mg 30 Min vor dem Schlafengehen',
+                evidence: 'Hochgradig evidenzbasiert',
+                priority: 3,
+                importance: '🟡 MITTEL - Nur bei Schlafproblemen'
+            },
+            
+            // NIEDRIGE PRIORITÄT (Speziell/Optional)
+            {
+                name: 'L-Theanin',
+                category: 'cognitive',
+                description: 'Aminosäure für Entspannung ohne Müdigkeit. Synergistisch mit Koffein.',
+                dosage: '100-200mg bei Bedarf',
+                evidence: 'Moderat evidenzbasiert',
+                priority: 4,
+                importance: '🟢 NIEDRIG - Entspannung & Fokus'
+            },
+            {
+                name: 'Alpha-GPC',
+                category: 'cognitive',
+                description: 'Cholin-Quelle für Gehirnfunktion und Acetylcholin-Produktion.',
+                dosage: '300-600mg täglich',
+                evidence: 'Moderat evidenzbasiert',
+                priority: 4,
+                importance: '🟢 NIEDRIG - Kognitive Leistung'
+            },
+            {
+                name: 'Lion\'s Mane',
+                category: 'cognitive',
+                description: 'Heilpilz zur Unterstützung der Neurogenese und kognitiven Funktion.',
+                dosage: '500-1000mg täglich',
+                evidence: 'Moderat evidenzbasiert',
+                priority: 4,
+                importance: '🟢 NIEDRIG - Neuroplastizität'
+            },
+            {
+                name: 'Coenzym Q10',
+                category: 'performance',
+                description: 'Wichtig für Zellatmung und Herzgesundheit. Besonders relevant ab 40+.',
+                dosage: '100-200mg täglich mit Fett',
+                evidence: 'Gut evidenzbasiert',
+                priority: 4,
+                importance: '🟢 NIEDRIG - Ab 40+ Jahren'
+            },
+            {
+                name: 'Kollagen',
+                category: 'recovery',
+                description: 'Protein für Haut, Gelenke und Bindegewebe. Besonders für Sportler.',
+                dosage: '10-20g täglich',
+                evidence: 'Moderat evidenzbasiert',
+                priority: 4,
+                importance: '🟢 NIEDRIG - Gelenke & Haut'
+            },
+            {
+                name: 'Berberin',
+                category: 'performance',
+                description: 'Natürlicher Blutzuckerregulator mit ähnlicher Wirkung wie Metformin.',
+                dosage: '500mg 2-3x täglich vor Mahlzeiten',
+                evidence: 'Gut evidenzbasiert',
+                priority: 4,
+                importance: '🟢 NIEDRIG - Blutzuckermanagement'
+            },
+            {
+                name: 'NAD+ Booster (NMN/NR)',
+                category: 'recovery',
+                description: 'Unterstützt zelluläre Energieproduktion und Anti-Aging-Prozesse.',
+                dosage: '250-500mg täglich',
+                evidence: 'Experimentell',
+                priority: 4,
+                importance: '🟢 NIEDRIG - Experimentell/Teuer'
+            }
+        ];
+
+        const SCHEDULE_DATA = [
+            { time: '06:00', activity: 'Aufwachen', description: 'Natürliches Erwachen ohne Snooze', phase: 'morning' },
+            { time: '06:15', activity: 'Morgendliche Routine', description: '500ml Wasser, 5 Min Meditation', phase: 'morning' },
+            { time: '07:00', activity: 'Bewegung', description: '20-30 Min Sport oder Spaziergang', phase: 'morning' },
+            { time: '08:00', activity: 'Frühstück', description: 'Proteinreich mit gesunden Fetten', phase: 'morning' },
+            { time: '09:00', activity: 'Fokusphase 1', description: 'Schwierigste Aufgaben zuerst', phase: 'focus', focus: true },
+            { time: '10:30', activity: 'Pause', description: '15 Min Pause, Wasser trinken', phase: 'break' },
+            { time: '10:45', activity: 'Fokusphase 1 (Fortsetzung)', description: 'Deep Work fortsetzen', phase: 'focus', focus: true },
+            { time: '12:00', activity: 'Mittagessen', description: 'Ausgewogene Mahlzeit', phase: 'lunch' },
+            { time: '13:00', activity: 'Mittagspause', description: '30 Min entspannen oder spazieren', phase: 'break' },
+            { time: '13:30', activity: 'Fokusphase 2', description: 'Kreative Arbeiten', phase: 'focus', focus: true },
+            { time: '15:00', activity: 'Pause', description: '15 Min Pause, gesunder Snack', phase: 'break' },
+            { time: '15:15', activity: 'Fokusphase 2 (Fortsetzung)', description: 'Projekte voranbringen', phase: 'focus', focus: true },
+            { time: '16:30', activity: 'Fokusphase 3', description: 'Administrative Aufgaben', phase: 'focus', focus: true },
+            { time: '18:00', activity: 'Arbeitsende', description: 'Klarer Schnitt zwischen Arbeit und Freizeit', phase: 'evening' },
+            { time: '19:00', activity: 'Abendessen', description: 'Leichte, frühe Mahlzeit', phase: 'evening' },
+            { time: '20:00', activity: 'Entspannung', description: 'Hobbys, soziale Zeit, Entspannung', phase: 'evening' },
+            { time: '21:00', activity: 'Abendroutine', description: 'Bildschirme reduzieren, entspannen', phase: 'evening' },
+            { time: '22:00', activity: 'Schlafen', description: 'Für optimale Regeneration', phase: 'sleep' }
+        ];
+
+        const HEALTH_TIPS = [
+            // Hydration & Stoffwechsel
+            'Trinke direkt nach dem Aufwachen 500ml Wasser, um den Stoffwechsel anzukurbeln.',
+            'Füge eine Prise Himalaya-Salz zu deinem Morgenwasser hinzu für bessere Hydration.',
+            'Trinke 30 Minuten vor jeder Mahlzeit ein Glas Wasser für bessere Verdauung.',
+            'Kaltes Wasser (15-17°C) kann den Stoffwechsel um bis zu 30% für 1 Stunde steigern.',
+            
+            // Circadianer Rhythmus & Schlaf
+            'Gehe täglich mindestens 20 Minuten ins Tageslicht für bessere Schlafqualität.',
+            'Vermeide Koffein 8 Stunden vor dem Schlafengehen für tieferen Schlaf.',
+            'Reduziere blaues Licht 2 Stunden vor dem Schlafengehen.',
+            'Halte dein Schlafzimmer zwischen 16-19°C für optimale Schlafqualität.',
+            'Verwende eine Schlafmaske und Ohrstöpsel für tieferen Schlaf.',
+            'Stehe jeden Tag zur gleichen Zeit auf, auch am Wochenende.',
+            
+            // Fokus & Produktivität  
+            'Nutze die ersten 90 Minuten nach dem Aufwachen für deine wichtigsten Aufgaben.',
+            'Mache alle 90 Minuten eine 15-minütige Pause für optimale Konzentration.',
+            'Vermeide Multitasking - fokussiere dich auf eine Aufgabe zur Zeit.',
+            'Nutze die Pomodoro-Technik: 25 Min arbeiten, 5 Min Pause.',
+            'Schalte Benachrichtigungen während Fokuszeiten komplett aus.',
+            
+            // Ernährung & Timing
+            'Iss deine letzte Mahlzeit 3 Stunden vor dem Schlafengehen.',
+            'Praktiziere intermittierendes Fasten mit einem 16:8 Fenster.',
+            'Iss binnen 1 Stunde nach dem Aufwachen etwas Protein (20-30g).',
+            'Kombiniere Kohlenhydrate immer mit Protein oder gesunden Fetten.',
+            'Kaue jeden Bissen mindestens 20 Mal für bessere Verdauung.',
+            
+            // Bewegung & Erholung
+            'Mache nach jeder Mahlzeit einen 10-minütigen Spaziergang.',
+            'Integriere täglich mindestens 7 Minuten Bewegung - schon das hilft!',
+            'Praktiziere täglich 5-10 Minuten Meditation oder Atemübungen.',
+            'Nimm täglich 10 tiefe Atemzüge (4 Sekunden ein, 6 Sekunden aus).',
+            'Stehe jede Stunde für mindestens 2 Minuten auf.',
+            
+            // Hormonoptimierung
+            'Vermeide warme Duschen am Morgen - kalte Duschen aktivieren Noradrenalin.',
+            'Exponiere dich täglich 2-3 Minuten extremer Kälte (kalte Dusche).',
+            'Praktiziere Sauna oder heiße Bäder 3-4x pro Woche für Wachstumshormon.',
+            'Iss Zink-reiche Lebensmittel für optimale Testosteronproduktion.',
+            
+            // Stressmanagement
+            'Führe ein Dankbarkeitstagebuch - schreibe täglich 3 Dinge auf.',
+            'Praktiziere die 4-7-8 Atemtechnik bei Stress (4 ein, 7 halten, 8 aus).',
+            'Verbringe täglich mindestens 10 Minuten in der Natur.',
+            'Lache täglich - es reduziert Cortisol und stärkt das Immunsystem.',
+            
+            // Soziale Verbindungen
+            'Führe täglich mindestens ein bedeutungsvolles Gespräch.',
+            'Umarme Menschen täglich - Oxytocin reduziert Stress.',
+            'Verbringe Zeit mit Menschen, die dich inspirieren und unterstützen.',
+            
+            // Technologie & Digital 
+            'Lege das Handy 1 Stunde vor dem Schlafen weg.',
+            'Verwende Apps zur Überwachung deiner Bildschirmzeit.',
+            'Praktiziere täglich 1 Stunde "Digital Detox".',
+            
+            // Supplements & Mikronährstoffe
+            'Nimm Vitamin D3 am Morgen mit Fett für optimale Absorption.',
+            'Kombiniere Magnesium mit Glycin am Abend für besseren Schlaf.',
+            'Iss täglich eine Handvoll Nüsse für gesunde Omega-3-Fettsäuren.',
+            
+            // Mentale Optimierung
+            'Visualisiere täglich 5 Minuten deine Ziele so detailliert wie möglich.',
+            'Lerne täglich etwas Neues - auch nur 10 Minuten fördern Neuroplastizität.',
+            'Setze dir täglich 1-3 klare, messbare Prioritäten.',
+            'Reflektiere abends 5 Minuten über den Tag und plane den nächsten.',
+            
+            // Umgebungsoptimierung
+            'Halte deinen Arbeitsplatz sauber und minimalistisch.',
+            'Verwende Pflanzen zur Verbesserung der Luftqualität.',
+            'Optimiere die Beleuchtung - helles Licht am Tag, warmes am Abend.',
+            'Kontrolliere die Luftfeuchtigkeit (40-60%) für optimale Gesundheit.'
+        ];
+
+        const GOALS_DATA = [
+            { id: 'water', icon: '💧', title: 'Ausreichend trinken', description: '2.5L Wasser täglich' },
+            { id: 'sleep', icon: '😴', title: 'Guter Schlaf', description: '7-9 Stunden Schlaf' },
+            { id: 'exercise', icon: '🏃', title: 'Täglich bewegen', description: 'Mindestens 30 Min' },
+            { id: 'nutrition', icon: '🥗', title: 'Gesunde Ernährung', description: 'Ausgewogene Mahlzeiten' },
+            { id: 'stress', icon: '🧘', title: 'Stress reduzieren', description: 'Entspannungstechniken' },
+            { id: 'focus', icon: '🎯', title: 'Fokus verbessern', description: '90-Min Deep Work' },
+            { id: 'energy', icon: '⚡', title: 'Mehr Energie', description: 'Optimierte Tagesroutine' },
+            { id: 'balance', icon: '⚖️', title: 'Work-Life-Balance', description: 'Ausgewogener Alltag' }
+        ];
+
+        // Initialize App
+        function initApp() {
+            loadFromStorage();
+            setupEventListeners();
+            renderSupplements();
+            renderSchedule();
+            renderGoals();
+            updateWaterDisplay();
+            updateTimerDisplay();
+            updateBMI();
+            updateDailyInputs();
+            showDailyTip();
+            
+            // Show loading screen for 2 seconds
+            setTimeout(() => {
+                showScreen('home');
+                document.getElementById('bottom-nav').classList.remove('hidden');
+            }, 2000);
+
+            // Setup service worker for PWA
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js');
+            }
+
+            // Setup install prompt
+            let deferredPrompt;
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                document.getElementById('install-app').classList.remove('hidden');
+            });
+
+            document.getElementById('install-app').addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    deferredPrompt = null;
+                    if (outcome === 'accepted') {
+                        document.getElementById('install-app').classList.add('hidden');
+                    }
+                }
+            });
+        }
+
+        // Event Listeners
+        function setupEventListeners() {
+            // Navigation
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const screen = e.currentTarget.dataset.screen;
+                    showScreen(screen);
+                    updateNavigation(screen);
+                });
+            });
+
+            // Water tracking
+            document.querySelectorAll('.btn-water').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const amount = parseInt(e.target.dataset.amount);
+                    addWater(amount);
+                });
+            });
+
+            // Timer
+            document.getElementById('timer-start').addEventListener('click', startTimer);
+            document.getElementById('timer-pause').addEventListener('click', pauseTimer);
+            document.getElementById('timer-reset').addEventListener('click', resetTimer);
+
+            // Supplements filters
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const filter = e.target.dataset.filter;
+                    filterSupplements(filter);
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                });
+            });
+
+            // Progress tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const tab = e.target.dataset.tab;
+                    showProgressTab(tab);
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                });
+            });
+
+            // Daily progress inputs
+            document.getElementById('energy-level').addEventListener('input', updateSliderValue);
+            document.getElementById('sleep-quality').addEventListener('input', updateSliderValue);
+            document.getElementById('mood-level').addEventListener('input', updateSliderValue);
+            document.getElementById('save-daily').addEventListener('click', saveDailyProgress);
+
+            // Profile inputs
+            document.getElementById('user-height').addEventListener('input', updateBMI);
+            document.getElementById('user-weight').addEventListener('input', updateBMI);
+            document.getElementById('user-name').addEventListener('input', saveUserData);
+            document.getElementById('user-age').addEventListener('input', saveUserData);
+
+            // Settings
+            document.getElementById('notifications-enabled').addEventListener('change', toggleNotifications);
+            document.getElementById('export-data').addEventListener('click', exportData);
+
+            // Schedule editing
+            document.getElementById('edit-schedule').addEventListener('click', toggleScheduleEditMode);
+            document.getElementById('add-schedule-item').addEventListener('click', addScheduleItem);
+            document.getElementById('save-schedule').addEventListener('click', saveSchedule);
+            document.getElementById('reset-schedule').addEventListener('click', resetSchedule);
+
+            // Health tips navigation
+            document.getElementById('prev-tip').addEventListener('click', showPreviousTip);
+            document.getElementById('next-tip').addEventListener('click', showNextTip);
+            document.getElementById('daily-tip-btn').addEventListener('click', showTodaysTip);
+            document.getElementById('random-tip').addEventListener('click', showRandomTip);
+        }
+
+        // Screen Management
+        function showScreen(screenName) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+                screen.classList.add('hidden');
+            });
+            
+            const targetScreen = document.getElementById(screenName);
+            if (targetScreen) {
+                targetScreen.classList.remove('hidden');
+                targetScreen.classList.add('active');
+                AppState.currentScreen = screenName;
+            }
+        }
+
+        function updateNavigation(activeScreen) {
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-screen="${activeScreen}"]`).classList.add('active');
+        }
+
+        // Water Tracking
+        function addWater(amount) {
+            AppState.waterIntake += amount;
+            if (AppState.waterIntake > AppState.waterTarget) {
+                AppState.waterIntake = AppState.waterTarget;
+            }
+            updateWaterDisplay();
+            saveToStorage();
+            
+            // Check if goal reached
+            if (AppState.waterIntake >= AppState.waterTarget) {
+                showNotification('🎉 Wasserziel erreicht! Großartig!');
+            }
+        }
+
+        function updateWaterDisplay() {
+            document.getElementById('water-current').textContent = AppState.waterIntake;
+            document.getElementById('water-target').textContent = AppState.waterTarget;
+            
+            const percentage = (AppState.waterIntake / AppState.waterTarget) * 100;
+            document.getElementById('water-progress').style.width = `${percentage}%`;
+        }
+
+        // Timer Functions
+        function startTimer() {
+            if (!AppState.timerRunning) {
+                AppState.timerRunning = true;
+                AppState.timerInterval = setInterval(() => {
+                    AppState.timerTime--;
+                    updateTimerDisplay();
+                    
+                    if (AppState.timerTime <= 0) {
+                        pauseTimer();
+                        showNotification('⏰ 90-Minuten Timer beendet! Zeit für eine Pause.');
+                        AppState.timerTime = 90 * 60;
+                        updateTimerDisplay();
+                    }
+                }, 1000);
+                
+                document.getElementById('timer-start').classList.add('hidden');
+                document.getElementById('timer-pause').classList.remove('hidden');
+            }
+        }
+
+        function pauseTimer() {
+            AppState.timerRunning = false;
+            clearInterval(AppState.timerInterval);
+            document.getElementById('timer-start').classList.remove('hidden');
+            document.getElementById('timer-pause').classList.add('hidden');
+        }
+
+        function resetTimer() {
+            pauseTimer();
+            AppState.timerTime = 90 * 60;
+            updateTimerDisplay();
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(AppState.timerTime / 60);
+            const seconds = AppState.timerTime % 60;
+            document.getElementById('timer-time').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Schedule
+        function renderSchedule() {
+            const container = document.getElementById('schedule-timeline');
+            const today = new Date().toLocaleDateString('de-DE', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            document.getElementById('schedule-date').textContent = today;
+            
+            const scheduleData = AppState.customSchedule || SCHEDULE_DATA;
+            
+            if (AppState.scheduleEditMode) {
+                container.innerHTML = scheduleData.map((item, index) => `
+                    <div class="schedule-item ${item.focus ? 'focus-phase' : ''} edit-mode">
+                        <div class="schedule-edit-controls">
+                            <input type="time" class="edit-time" value="${item.time}" data-index="${index}">
+                            <button class="btn-delete" onclick="deleteScheduleItem(${index})">🗑️</button>
+                        </div>
+                        <div class="schedule-edit-content">
+                            <input type="text" class="edit-activity" value="${item.activity}" data-index="${index}" placeholder="Aktivität">
+                            <textarea class="edit-description" data-index="${index}" placeholder="Beschreibung">${item.description}</textarea>
+                            <div class="schedule-options">
+                                <label>
+                                    <input type="checkbox" class="edit-focus" data-index="${index}" ${item.focus ? 'checked' : ''}>
+                                    Fokusphase
+                                </label>
+                                <label>
+                                    <input type="checkbox" class="edit-notification" data-index="${index}" ${AppState.scheduleNotifications[`${item.time}-${item.activity}`] ? 'checked' : ''}>
+                                    Benachrichtigung
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                container.innerHTML = scheduleData.map((item, index) => `
+                    <div class="schedule-item ${item.focus ? 'focus-phase' : ''}">
+                        <div class="schedule-time">${item.time}</div>
+                        <div class="schedule-activity">
+                            <h4>${item.activity}</h4>
+                            <p>${item.description}</p>
+                            ${AppState.scheduleNotifications[`${item.time}-${item.activity}`] 
+                                ? '<div class="notification-indicator">🔔 Benachrichtigung aktiv</div>' 
+                                : ''}
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            // Setup notifications for current schedule
+            if (!AppState.scheduleEditMode) {
+                setupScheduleNotifications();
+            }
+        }
+
+        // Supplements
+        function renderSupplements() {
+            AppState.supplements = SUPPLEMENTS_DATA;
+            filterSupplements('all');
+        }
+
+        function filterSupplements(category) {
+            let filtered;
+            
+            if (category === 'all') {
+                filtered = AppState.supplements;
+            } else if (category.startsWith('priority-')) {
+                const priority = parseInt(category.replace('priority-', ''));
+                filtered = AppState.supplements.filter(s => s.priority === priority);
+            } else {
+                filtered = AppState.supplements.filter(s => s.category === category);
+            }
+            
+            // Sort by priority (critical first)
+            filtered.sort((a, b) => a.priority - b.priority);
+            
+            const container = document.getElementById('supplements-list');
+            container.innerHTML = filtered.map(supplement => `
+                <div class="supplement-card priority-${supplement.priority}">
+                    <div class="supplement-header">
+                        <div class="supplement-name">${supplement.name}</div>
+                        <div class="supplement-category">${getCategoryName(supplement.category)}</div>
+                    </div>
+                    <div class="supplement-importance">${supplement.importance}</div>
+                    <div class="supplement-description">${supplement.description}</div>
+                    <div class="supplement-dosage"><strong>Dosierung:</strong> ${supplement.dosage}</div>
+                    <div class="supplement-evidence"><strong>Evidenz:</strong> ${supplement.evidence}</div>
+                    <div class="supplement-actions">
+                        <button class="btn-add ${AppState.mySupplements.includes(supplement.name) ? 'added' : ''}" 
+                                onclick="toggleSupplement('${supplement.name}')">
+                            ${AppState.mySupplements.includes(supplement.name) ? 'Entfernen' : 'Hinzufügen'}
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getCategoryName(category) {
+            const names = {
+                'cognitive': 'Kognition',
+                'performance': 'Performance',
+                'recovery': 'Recovery'
+            };
+            return names[category] || category;
+        }
+
+        function toggleSupplement(name) {
+            const index = AppState.mySupplements.indexOf(name);
+            if (index > -1) {
+                AppState.mySupplements.splice(index, 1);
+            } else {
+                AppState.mySupplements.push(name);
+            }
+            saveToStorage();
+            filterSupplements(document.querySelector('.filter-btn.active').dataset.filter);
+        }
+
+        // Progress Tracking
+        function showProgressTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.getElementById(`${tab}-tab`).classList.remove('hidden');
+            
+            if (tab === 'weekly') {
+                renderWeeklyStats();
+            } else if (tab === 'insights') {
+                renderInsights();
+            }
+        }
+
+        function updateSliderValue(e) {
+            const value = e.target.value;
+            const valueSpan = document.getElementById(e.target.id.replace('-level', '-value').replace('-quality', '-value'));
+            if (valueSpan) {
+                valueSpan.textContent = value;
+            }
+        }
+
+        function saveDailyProgress() {
+            AppState.dailyData = {
+                energy: parseInt(document.getElementById('energy-level').value),
+                sleep: parseInt(document.getElementById('sleep-quality').value),
+                mood: parseInt(document.getElementById('mood-level').value),
+                date: new Date().toISOString().split('T')[0]
+            };
+            
+            // Save to history
+            const history = JSON.parse(localStorage.getItem('dailyHistory') || '[]');
+            history.push(AppState.dailyData);
+            localStorage.setItem('dailyHistory', JSON.stringify(history));
+            
+            saveToStorage();
+            showNotification('✅ Täglicher Fortschritt gespeichert!');
+        }
+
+        function updateDailyInputs() {
+            document.getElementById('energy-level').value = AppState.dailyData.energy;
+            document.getElementById('sleep-quality').value = AppState.dailyData.sleep;
+            document.getElementById('mood-level').value = AppState.dailyData.mood;
+            document.getElementById('energy-value').textContent = AppState.dailyData.energy;
+            document.getElementById('sleep-value').textContent = AppState.dailyData.sleep;
+            document.getElementById('mood-value').textContent = AppState.dailyData.mood;
+        }
+
+        function renderWeeklyStats() {
+            const history = JSON.parse(localStorage.getItem('dailyHistory') || '[]');
+            const lastWeek = history.slice(-7);
+            
+            const container = document.getElementById('weekly-charts');
+            if (lastWeek.length === 0) {
+                container.innerHTML = '<p>Noch keine Daten für diese Woche vorhanden.</p>';
+                return;
+            }
+            
+            const avgEnergy = lastWeek.reduce((sum, day) => sum + day.energy, 0) / lastWeek.length;
+            const avgSleep = lastWeek.reduce((sum, day) => sum + day.sleep, 0) / lastWeek.length;
+            const avgMood = lastWeek.reduce((sum, day) => sum + day.mood, 0) / lastWeek.length;
+            
+            container.innerHTML = `
+                <div class="weekly-summary">
+                    <h4>Wochendurchschnitt</h4>
+                    <div class="stat-item">
+                        <span>Energie:</span>
+                        <span>${avgEnergy.toFixed(1)}/10</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Schlaf:</span>
+                        <span>${avgSleep.toFixed(1)}/10</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Stimmung:</span>
+                        <span>${avgMood.toFixed(1)}/10</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderInsights() {
+            const history = JSON.parse(localStorage.getItem('dailyHistory') || '[]');
+            const container = document.getElementById('insights-content');
+            
+            if (history.length < 3) {
+                container.innerHTML = '<p>Sammle mindestens 3 Tage Daten für erste Insights.</p>';
+                return;
+            }
+            
+            const insights = generateInsights(history);
+            container.innerHTML = insights.map(insight => `
+                <div class="insight-item">
+                    <h4>${insight.title}</h4>
+                    <p>${insight.description}</p>
+                </div>
+            `).join('');
+        }
+
+        function generateInsights(history) {
+            const insights = [];
+            const recent = history.slice(-7);
+            const avgEnergy = recent.reduce((sum, day) => sum + day.energy, 0) / recent.length;
+            
+            if (avgEnergy >= 7) {
+                insights.push({
+                    title: '🔥 Hohes Energielevel',
+                    description: 'Dein Energielevel ist konstant hoch! Behalte deine aktuellen Gewohnheiten bei.'
+                });
+            } else if (avgEnergy < 5) {
+                insights.push({
+                    title: '⚠️ Niedriges Energielevel',
+                    description: 'Überprüfe deine Schlafqualität, Ernährung und Stresslevel. Mehr Bewegung könnte helfen.'
+                });
+            }
+            
+            return insights;
+        }
+
+        // Profile
+        function renderGoals() {
+            const container = document.getElementById('goals-list');
+            container.innerHTML = GOALS_DATA.map(goal => `
+                <div class="goal-card ${AppState.userData.goals.includes(goal.id) ? 'active' : ''}" 
+                     onclick="toggleGoal('${goal.id}')">
+                    <div class="goal-icon">${goal.icon}</div>
+                    <div class="goal-title">${goal.title}</div>
+                </div>
+            `).join('');
+        }
+
+        function toggleGoal(goalId) {
+            const index = AppState.userData.goals.indexOf(goalId);
+            if (index > -1) {
+                AppState.userData.goals.splice(index, 1);
+            } else {
+                AppState.userData.goals.push(goalId);
+            }
+            saveToStorage();
+            renderGoals();
+        }
+
+        function updateBMI() {
+            const height = parseFloat(document.getElementById('user-height').value);
+            const weight = parseFloat(document.getElementById('user-weight').value);
+            
+            if (height && weight) {
+                const bmi = (weight / ((height / 100) ** 2)).toFixed(1);
+                document.getElementById('bmi-value').textContent = bmi;
+                
+                AppState.userData.height = height;
+                AppState.userData.weight = weight;
+                saveToStorage();
+            }
+        }
+
+        function saveUserData() {
+            AppState.userData.name = document.getElementById('user-name').value;
+            AppState.userData.age = parseInt(document.getElementById('user-age').value);
+            saveToStorage();
+        }
+
+        // Notifications
+        function toggleNotifications() {
+            AppState.notifications = document.getElementById('notifications-enabled').checked;
+            saveToStorage();
+            
+            if (AppState.notifications) {
+                requestNotificationPermission();
+            }
+        }
+
+        function requestNotificationPermission() {
+            if ('Notification' in window) {
+                Notification.requestPermission();
+            }
+        }
+
+        function showNotification(message) {
+            if (AppState.notifications && 'Notification' in window && Notification.permission === 'granted') {
+                new Notification('LifeOptima', {
+                    body: message,
+                    icon: '/icon-192x192.png'
+                });
+            }
+        }
+
+        // Health Tips
+        function showDailyTip() {
+            // Generate daily tip based on current date for consistency
+            const today = new Date();
+            const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+            AppState.currentTipIndex = dayOfYear % HEALTH_TIPS.length;
+            updateTipDisplay();
+        }
+
+        function updateTipDisplay() {
+            const tip = HEALTH_TIPS[AppState.currentTipIndex];
+            document.getElementById('daily-tip').textContent = tip;
+            document.getElementById('tip-current').textContent = AppState.currentTipIndex + 1;
+            document.getElementById('tip-total').textContent = HEALTH_TIPS.length;
+            
+            // Update daily tip badge
+            const today = new Date();
+            const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+            const dailyTipIndex = dayOfYear % HEALTH_TIPS.length;
+            const badge = document.getElementById('daily-tip-badge');
+            
+            if (AppState.currentTipIndex === dailyTipIndex) {
+                badge.style.display = 'block';
+                badge.textContent = '📅 Tipp des Tages';
+            } else {
+                badge.style.display = 'block';
+                badge.textContent = '📖 Durchsuchen';
+                badge.style.background = '#f3f4f6';
+                badge.style.color = '#6b7280';
+            }
+            
+            // Update button states
+            const prevBtn = document.getElementById('prev-tip');
+            const nextBtn = document.getElementById('next-tip');
+            
+            prevBtn.disabled = AppState.currentTipIndex === 0;
+            nextBtn.disabled = AppState.currentTipIndex === HEALTH_TIPS.length - 1;
+            
+            if (prevBtn.disabled) {
+                prevBtn.style.opacity = '0.5';
+            } else {
+                prevBtn.style.opacity = '1';
+            }
+            
+            if (nextBtn.disabled) {
+                nextBtn.style.opacity = '0.5';
+            } else {
+                nextBtn.style.opacity = '1';
+            }
+            
+            saveToStorage();
+        }
+
+        function showNextTip() {
+            if (AppState.currentTipIndex < HEALTH_TIPS.length - 1) {
+                AppState.currentTipIndex++;
+                updateTipDisplay();
+            }
+        }
+
+        function showPreviousTip() {
+            if (AppState.currentTipIndex > 0) {
+                AppState.currentTipIndex--;
+                updateTipDisplay();
+            }
+        }
+
+        function showTodaysTip() {
+            const today = new Date();
+            const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+            AppState.currentTipIndex = dayOfYear % HEALTH_TIPS.length;
+            updateTipDisplay();
+        }
+
+        function showRandomTip() {
+            AppState.currentTipIndex = Math.floor(Math.random() * HEALTH_TIPS.length);
+            updateTipDisplay();
+        }
+
+        // Data Management
+        function saveToStorage() {
+            localStorage.setItem('lifeOptima', JSON.stringify(AppState));
+        }
+
+        function loadFromStorage() {
+            const saved = localStorage.getItem('lifeOptima');
+            if (saved) {
+                const data = JSON.parse(saved);
+                Object.assign(AppState, data);
+                
+                // Reset daily data if new day
+                const today = new Date().toISOString().split('T')[0];
+                if (!AppState.dailyData.date || AppState.dailyData.date !== today) {
+                    AppState.waterIntake = 0;
+                    AppState.dailyData = { energy: 5, sleep: 5, mood: 5, date: today };
+                }
+                
+                // Check if tip should be reset for new day
+                const lastTipDate = localStorage.getItem('lifeOptima_tipDate');
+                if (lastTipDate !== today) {
+                    // New day - set tip based on date, but don't override manual navigation
+                    const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+                    AppState.currentTipIndex = dayOfYear % HEALTH_TIPS.length;
+                    localStorage.setItem('lifeOptima_tipDate', today);
+                }
+            } else {
+                // First time - set daily tip
+                const today = new Date().toISOString().split('T')[0];
+                const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+                AppState.currentTipIndex = dayOfYear % HEALTH_TIPS.length;
+                localStorage.setItem('lifeOptima_tipDate', today);
+            }
+        }
+
+        function exportData() {
+            const history = JSON.parse(localStorage.getItem('dailyHistory') || '[]');
+            const exportData = {
+                appState: AppState,
+                dailyHistory: history,
+                exportDate: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `lifeoptima-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showNotification('📦 Daten erfolgreich exportiert!');
+        }
+
+        // Schedule Functions
+        function toggleScheduleEditMode() {
+            AppState.scheduleEditMode = !AppState.scheduleEditMode;
+            
+            const editBtn = document.getElementById('edit-schedule');
+            const addBtn = document.getElementById('add-schedule-item');
+            const saveBtn = document.getElementById('save-schedule');
+            const resetBtn = document.getElementById('reset-schedule');
+            
+            if (AppState.scheduleEditMode) {
+                editBtn.textContent = '❌ Abbrechen';
+                addBtn.classList.remove('hidden');
+                saveBtn.classList.remove('hidden');
+                resetBtn.classList.remove('hidden');
+            } else {
+                editBtn.textContent = '✏️ Bearbeiten';
+                addBtn.classList.add('hidden');
+                saveBtn.classList.add('hidden');
+                resetBtn.classList.add('hidden');
+            }
+            
+            renderSchedule();
+        }
+
+        function addScheduleItem() {
+            const scheduleData = AppState.customSchedule || [...SCHEDULE_DATA];
+            const newItem = {
+                time: '12:00',
+                activity: 'Neue Aktivität',
+                description: 'Beschreibung hinzufügen',
+                phase: 'custom',
+                focus: false
+            };
+            
+            scheduleData.push(newItem);
+            scheduleData.sort((a, b) => a.time.localeCompare(b.time));
+            AppState.customSchedule = scheduleData;
+            renderSchedule();
+        }
+
+        function deleteScheduleItem(index) {
+            if (confirm('Diesen Eintrag wirklich löschen?')) {
+                const scheduleData = AppState.customSchedule || [...SCHEDULE_DATA];
+                scheduleData.splice(index, 1);
+                AppState.customSchedule = scheduleData;
+                renderSchedule();
+            }
+        }
+
+        function saveSchedule() {
+            const scheduleData = AppState.customSchedule || [...SCHEDULE_DATA];
+            const updatedSchedule = [];
+            
+            document.querySelectorAll('.schedule-item.edit-mode').forEach((item, index) => {
+                const time = item.querySelector('.edit-time').value;
+                const activity = item.querySelector('.edit-activity').value;
+                const description = item.querySelector('.edit-description').value;
+                const focus = item.querySelector('.edit-focus').checked;
+                const notification = item.querySelector('.edit-notification').checked;
+                
+                const scheduleItem = {
+                    time,
+                    activity,
+                    description,
+                    phase: focus ? 'focus' : 'custom',
+                    focus
+                };
+                
+                updatedSchedule.push(scheduleItem);
+                
+                // Handle notifications
+                const notificationKey = `${time}-${activity}`;
+                if (notification) {
+                    AppState.scheduleNotifications[notificationKey] = true;
+                } else {
+                    delete AppState.scheduleNotifications[notificationKey];
+                }
+            });
+            
+            // Sort by time
+            updatedSchedule.sort((a, b) => a.time.localeCompare(b.time));
+            AppState.customSchedule = updatedSchedule;
+            
+            saveToStorage();
+            toggleScheduleEditMode();
+            showNotification('📅 Tagesplan gespeichert!');
+        }
+
+        function resetSchedule() {
+            if (confirm('Tagesplan auf Standard zurücksetzen?')) {
+                AppState.customSchedule = null;
+                AppState.scheduleNotifications = {};
+                saveToStorage();
+                renderSchedule();
+                showNotification('🔄 Tagesplan zurückgesetzt!');
+            }
+        }
+
+        function setupScheduleNotifications() {
+            if (!AppState.notifications) return;
+            
+            const now = new Date();
+            const scheduleData = AppState.customSchedule || SCHEDULE_DATA;
+            
+            Object.keys(AppState.scheduleNotifications).forEach(key => {
+                const [time, activity] = key.split('-');
+                const [hours, minutes] = time.split(':').map(Number);
+                
+                const scheduledTime = new Date();
+                scheduledTime.setHours(hours, minutes, 0, 0);
+                
+                // If the time is in the past, schedule for tomorrow
+                if (scheduledTime <= now) {
+                    scheduledTime.setDate(scheduledTime.getDate() + 1);
+                }
+                
+                const timeUntilNotification = scheduledTime.getTime() - now.getTime();
+                
+                if (timeUntilNotification > 0) {
+                    setTimeout(() => {
+                        showNotification(`⏰ ${activity} - Es ist ${time} Uhr!`);
+                    }, timeUntilNotification);
+                }
+            });
+        }
+
+        // Start the app
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html> 
