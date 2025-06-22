@@ -1358,8 +1358,6 @@
                                 <span id="tip-current">1</span> / <span id="tip-total">48</span>
                             </div>
                             <div class="tip-buttons">
-                                <button id="prev-tip" class="btn-tip">⬅️ Vorheriger</button>
-                                <button id="next-tip" class="btn-tip">Nächster ➡️</button>
                                 <button id="daily-tip-btn" class="btn-tip btn-tip-daily">📅 Heute</button>
                                 <button id="random-tip" class="btn-tip">🎲 Zufällig</button>
                             </div>
@@ -2018,8 +2016,6 @@
             document.getElementById('reset-schedule').addEventListener('click', resetSchedule);
 
             // Health tips navigation
-            document.getElementById('prev-tip').addEventListener('click', showPreviousTip);
-            document.getElementById('next-tip').addEventListener('click', showNextTip);
             document.getElementById('daily-tip-btn').addEventListener('click', showTodaysTip);
             document.getElementById('random-tip').addEventListener('click', showRandomTip);
         }
@@ -2469,48 +2465,21 @@
             if (AppState.currentTipIndex === dailyTipIndex) {
                 badge.style.display = 'block';
                 badge.textContent = '📅 Tipp des Tages';
+                badge.style.background = 'linear-gradient(135deg, var(--secondary-500), var(--secondary-600))';
+                badge.style.color = 'white';
             } else {
                 badge.style.display = 'block';
                 badge.textContent = '📖 Durchsuchen';
-                badge.style.background = '#f3f4f6';
-                badge.style.color = '#6b7280';
-            }
-            
-            // Update button states
-            const prevBtn = document.getElementById('prev-tip');
-            const nextBtn = document.getElementById('next-tip');
-            
-            prevBtn.disabled = AppState.currentTipIndex === 0;
-            nextBtn.disabled = AppState.currentTipIndex === HEALTH_TIPS.length - 1;
-            
-            if (prevBtn.disabled) {
-                prevBtn.style.opacity = '0.5';
-            } else {
-                prevBtn.style.opacity = '1';
-            }
-            
-            if (nextBtn.disabled) {
-                nextBtn.style.opacity = '0.5';
-            } else {
-                nextBtn.style.opacity = '1';
+                badge.style.background = 'var(--glass-bg)';
+                badge.style.color = 'var(--neutral-700)';
             }
             
             saveToStorage();
         }
 
-        function showNextTip() {
-            if (AppState.currentTipIndex < HEALTH_TIPS.length - 1) {
-                AppState.currentTipIndex++;
-                updateTipDisplay();
-            }
-        }
 
-        function showPreviousTip() {
-            if (AppState.currentTipIndex > 0) {
-                AppState.currentTipIndex--;
-                updateTipDisplay();
-            }
-        }
+
+
 
         function showTodaysTip() {
             const today = new Date();
