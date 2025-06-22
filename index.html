@@ -751,17 +751,19 @@
          }
 
         .schedule-timeline {
-            background: white;
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
             border-radius: 15px;
             padding: 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow-md);
         }
 
         .schedule-item {
             display: flex;
             align-items: center;
             padding: 15px 0;
-            border-bottom: 1px solid #f3f4f6;
+            border-bottom: 1px solid var(--glass-border);
         }
 
         .schedule-item:last-child {
@@ -771,7 +773,7 @@
         .schedule-time {
             width: 80px;
             font-weight: 600;
-            color: #2563eb;
+            color: var(--primary-500);
             font-size: 0.9rem;
         }
 
@@ -783,15 +785,16 @@
         .schedule-activity h4 {
             font-weight: 600;
             margin-bottom: 4px;
+            color: var(--neutral-900);
         }
 
         .schedule-activity p {
-            color: #6b7280;
+            color: var(--neutral-700);
             font-size: 0.9rem;
         }
 
                  .focus-phase {
-             background: #fef3c7;
+             background: rgba(245, 158, 11, 0.1);
              border-left: 4px solid #f59e0b;
              padding-left: 15px;
              margin-left: -15px;
@@ -799,10 +802,12 @@
 
          /* Schedule Edit Mode */
          .schedule-item.edit-mode {
-             background: #f8fafc;
-             border: 2px solid #e2e8f0;
+             background: var(--glass-bg);
+             backdrop-filter: var(--glass-blur);
+             border: 2px solid var(--glass-border);
              padding: 15px;
              margin-bottom: 15px;
+             border-radius: 12px;
          }
 
          .schedule-edit-controls {
@@ -814,11 +819,12 @@
 
          .edit-time {
              padding: 8px 12px;
-             border: 2px solid #e2e8f0;
+             border: 2px solid var(--glass-border);
              border-radius: 6px;
              font-weight: 600;
-             color: #2563eb;
+             color: var(--primary-500);
              font-size: 0.9rem;
+             background: var(--glass-bg);
          }
 
          .btn-delete {
@@ -830,7 +836,7 @@
              cursor: pointer;
          }
 
-         .btn-delete:hover {
+         .btn-delete:active {
              background: #b91c1c;
          }
 
@@ -841,19 +847,23 @@
 
          .edit-activity {
              padding: 10px;
-             border: 2px solid #e2e8f0;
+             border: 2px solid var(--glass-border);
              border-radius: 6px;
              font-weight: 600;
              font-size: 1rem;
+             background: var(--glass-bg);
+             color: var(--neutral-900);
          }
 
          .edit-description {
              padding: 10px;
-             border: 2px solid #e2e8f0;
+             border: 2px solid var(--glass-border);
              border-radius: 6px;
              resize: vertical;
              min-height: 60px;
              font-family: inherit;
+             background: var(--glass-bg);
+             color: var(--neutral-900);
          }
 
          .schedule-options {
@@ -868,6 +878,7 @@
              gap: 8px;
              font-weight: 500;
              cursor: pointer;
+             color: var(--neutral-800);
          }
 
          .schedule-options input[type="checkbox"] {
@@ -876,7 +887,7 @@
          }
 
          .notification-indicator {
-             color: #059669;
+             color: var(--secondary-500);
              font-size: 0.8rem;
              font-weight: 500;
              margin-top: 5px;
@@ -916,16 +927,18 @@
         }
 
         .supplement-card {
-            background: white;
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
             border-radius: 12px;
             padding: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow-md);
             transition: all 0.2s ease;
         }
 
-        .supplement-card:hover {
+        .supplement-card:active {
             transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            box-shadow: var(--shadow-lg);
         }
 
         .supplement-header {
@@ -938,12 +951,12 @@
         .supplement-name {
             font-weight: 600;
             font-size: 1.1rem;
-            color: #1f2937;
+            color: var(--neutral-900);
         }
 
         .supplement-category {
-            background: #dbeafe;
-            color: #1e40af;
+            background: var(--primary-500);
+            color: var(--neutral-50);
             padding: 4px 12px;
             border-radius: 12px;
             font-size: 0.8rem;
@@ -951,14 +964,14 @@
         }
 
         .supplement-description {
-            color: #6b7280;
+            color: var(--neutral-700);
             margin-bottom: 15px;
             line-height: 1.5;
         }
 
         .supplement-dosage {
             font-weight: 500;
-            color: #059669;
+            color: var(--secondary-500);
             margin-bottom: 10px;
         }
 
@@ -973,12 +986,13 @@
              margin-bottom: 10px;
              padding: 8px 12px;
              border-radius: 8px;
-             background: #f8fafc;
+             background: var(--neutral-200);
+             color: var(--neutral-800);
          }
 
          .supplement-evidence {
              font-size: 0.9rem;
-             color: #6b7280;
+             color: var(--neutral-700);
              margin-bottom: 15px;
          }
 
@@ -988,7 +1002,7 @@
          }
 
          .priority-1 .supplement-importance {
-             background: #fef2f2;
+             background: rgba(220, 38, 38, 0.1);
              color: #dc2626;
          }
 
@@ -997,7 +1011,7 @@
          }
 
          .priority-2 .supplement-importance {
-             background: #fff7ed;
+             background: rgba(234, 88, 12, 0.1);
              color: #ea580c;
          }
 
@@ -1006,7 +1020,7 @@
          }
 
          .priority-3 .supplement-importance {
-             background: #fefce8;
+             background: rgba(202, 138, 4, 0.1);
              color: #ca8a04;
          }
 
@@ -1015,7 +1029,7 @@
          }
 
          .priority-4 .supplement-importance {
-             background: #ecfdf5;
+             background: rgba(5, 150, 105, 0.1);
              color: #059669;
          }
 
@@ -1042,6 +1056,60 @@
 
         .btn-add.added {
             background: #6b7280;
+        }
+
+        /* My Supplements Section */
+        .my-supplements-list {
+            min-height: 60px;
+            margin-bottom: 20px;
+        }
+
+        .empty-supplements {
+            color: var(--neutral-600);
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .my-supplement-item {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .my-supplement-info {
+            flex: 1;
+        }
+
+        .my-supplement-name {
+            font-weight: 600;
+            color: var(--neutral-900);
+            margin-bottom: 5px;
+        }
+
+        .my-supplement-dosage {
+            color: var(--neutral-700);
+            font-size: 0.9rem;
+        }
+
+        .btn-remove {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .btn-remove:active {
+            background: #b91c1c;
         }
 
         /* Progress */
@@ -1071,15 +1139,17 @@
         }
 
         .tab-content {
-            background: white;
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
             border-radius: 15px;
             padding: 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow-md);
         }
 
         .daily-input h3 {
             margin-bottom: 20px;
-            color: #1f2937;
+            color: var(--neutral-900);
         }
 
         .input-group {
@@ -1090,7 +1160,7 @@
             display: block;
             margin-bottom: 8px;
             font-weight: 500;
-            color: #374151;
+            color: var(--neutral-800);
         }
 
         .input-group input[type="range"] {
@@ -1102,10 +1172,12 @@
         .input-group input[type="number"] {
             width: 100%;
             padding: 12px;
-            border: 2px solid #e5e7eb;
+            border: 2px solid var(--glass-border);
             border-radius: 8px;
             font-size: 1rem;
             transition: border-color 0.2s ease;
+            background: var(--glass-bg);
+            color: var(--neutral-900);
         }
 
         .input-group input[type="text"]:focus,
@@ -1201,20 +1273,21 @@
          }
 
          .insight-item {
-             background: #f0f9ff;
-             border: 1px solid #bfdbfe;
+             background: var(--glass-bg);
+             backdrop-filter: var(--glass-blur);
+             border: 1px solid var(--glass-border);
              border-radius: 12px;
              padding: 15px;
              margin-bottom: 15px;
          }
 
          .insight-item h4 {
-             color: #1e40af;
+             color: var(--primary-500);
              margin-bottom: 8px;
          }
 
          .insight-item p {
-             color: #374151;
+             color: var(--neutral-800);
              line-height: 1.5;
          }
 
@@ -1268,12 +1341,74 @@
              .schedule-controls {
                  flex-direction: column;
                  align-items: stretch;
+                 gap: 10px;
+             }
+
+             .schedule-controls button {
+                 width: 100%;
+                 padding: 12px;
+                 font-size: 0.9rem;
              }
 
              .schedule-options {
                  flex-direction: column;
                  gap: 10px;
                  align-items: flex-start;
+             }
+
+             /* Schedule Edit Mode Mobile */
+             .schedule-item.edit-mode {
+                 padding: 12px;
+                 margin-bottom: 12px;
+             }
+
+             .schedule-edit-controls {
+                 flex-direction: column;
+                 gap: 10px;
+                 margin-bottom: 12px;
+             }
+
+             .edit-time {
+                 width: 100%;
+                 padding: 12px;
+                 font-size: 1rem;
+                 text-align: center;
+             }
+
+             .btn-delete {
+                 width: 100%;
+                 padding: 10px;
+                 font-size: 0.9rem;
+             }
+
+             .edit-activity,
+             .edit-description {
+                 width: 100%;
+                 padding: 12px;
+                 font-size: 1rem;
+             }
+
+             .edit-description {
+                 min-height: 80px;
+             }
+
+             .schedule-options {
+                 flex-direction: column;
+                 gap: 15px;
+                 align-items: stretch;
+             }
+
+             .schedule-options label {
+                 padding: 10px;
+                 background: var(--glass-bg);
+                 border: 1px solid var(--glass-border);
+                 border-radius: 8px;
+                 justify-content: center;
+             }
+
+             .schedule-options input[type="checkbox"] {
+                 width: 20px;
+                 height: 20px;
              }
 
              .tip-controls {
@@ -1310,6 +1445,44 @@
 
             .logo {
                 font-size: 3rem;
+            }
+
+            /* Schedule Edit Mode Small Mobile */
+            .schedule-item.edit-mode {
+                padding: 10px;
+                margin-bottom: 10px;
+            }
+
+            .schedule-edit-controls {
+                gap: 8px;
+                margin-bottom: 10px;
+            }
+
+            .edit-time,
+            .edit-activity,
+            .edit-description,
+            .btn-delete {
+                padding: 10px;
+                font-size: 0.9rem;
+            }
+
+            .schedule-options label {
+                padding: 8px;
+                font-size: 0.9rem;
+            }
+
+            .schedule-options input[type="checkbox"] {
+                width: 18px;
+                height: 18px;
+            }
+
+            .schedule-controls {
+                gap: 8px;
+            }
+
+            .schedule-controls button {
+                padding: 10px;
+                font-size: 0.8rem;
             }
         }
     </style>
@@ -1416,18 +1589,19 @@
         <div id="schedule" class="screen hidden">
             <header class="screen-header">
                 <h1>🕒 Tagesplan</h1>
-                <div class="schedule-controls">
-                    <div class="schedule-date" id="schedule-date"></div>
-                    <button id="edit-schedule" class="btn-secondary">✏️ Bearbeiten</button>
-                    <button id="add-schedule-item" class="btn-primary hidden">➕ Hinzufügen</button>
-                    <button id="save-schedule" class="btn-primary hidden">💾 Speichern</button>
-                    <button id="reset-schedule" class="btn-secondary hidden">🔄 Zurücksetzen</button>
-                </div>
+                <div class="schedule-date" id="schedule-date"></div>
             </header>
             
             <div class="content">
                 <div class="schedule-timeline" id="schedule-timeline">
                     <!-- Timeline wird dynamisch generiert -->
+                </div>
+                
+                <div class="schedule-controls">
+                    <button id="edit-schedule" class="btn-secondary">✏️ Bearbeiten</button>
+                    <button id="add-schedule-item" class="btn-primary hidden">➕ Hinzufügen</button>
+                    <button id="save-schedule" class="btn-primary hidden">💾 Speichern</button>
+                    <button id="reset-schedule" class="btn-secondary hidden">🔄 Zurücksetzen</button>
                 </div>
             </div>
         </div>
@@ -1449,8 +1623,21 @@
             </header>
             
             <div class="content">
-                <div id="supplements-list" class="supplements-grid">
-                    <!-- Supplements werden dynamisch generiert -->
+                <!-- Meine Supplements -->
+                <div class="card" id="my-supplements-section">
+                    <h2>📋 Meine Supplements</h2>
+                    <div id="my-supplements-list" class="my-supplements-list">
+                        <p class="empty-supplements">Noch keine Supplements hinzugefügt. Wähle unten aus der Liste aus.</p>
+                    </div>
+                    <button id="add-custom-supplement" class="btn-primary">➕ Eigenes hinzufügen</button>
+                </div>
+
+                <!-- Alle Supplements -->
+                <div class="card">
+                    <h2>🔍 Alle Supplements</h2>
+                    <div id="supplements-list" class="supplements-grid">
+                        <!-- Supplements werden dynamisch generiert -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -1590,6 +1777,7 @@
             },
             supplements: [],
             mySupplements: [],
+            customSupplements: [],
             notifications: true,
             customSchedule: null,
             scheduleEditMode: false,
@@ -1892,6 +2080,7 @@
             loadFromStorage();
             setupEventListeners();
             renderSupplements();
+            renderMySupplements();
             renderSchedule();
             renderGoals();
             updateWaterDisplay();
@@ -2065,6 +2254,9 @@
             // Health tips navigation
             document.getElementById('daily-tip-btn').addEventListener('click', showTodaysTip);
             document.getElementById('random-tip').addEventListener('click', showRandomTip);
+
+            // Supplements
+            document.getElementById('add-custom-supplement').addEventListener('click', addCustomSupplement);
         }
 
         // Screen Management
@@ -2299,6 +2491,91 @@
             }
             saveToStorage();
             filterSupplements(document.querySelector('.filter-btn.active').dataset.filter);
+            renderMySupplements();
+        }
+
+        function addCustomSupplement() {
+            const name = prompt('Name des Supplements:');
+            if (!name) return;
+            
+            const dosage = prompt('Dosierung (z.B. "500mg täglich"):');
+            if (!dosage) return;
+            
+            const customSupplement = {
+                name: name,
+                dosage: dosage,
+                custom: true
+            };
+            
+            // Add to custom supplements list
+            if (!AppState.customSupplements) {
+                AppState.customSupplements = [];
+            }
+            AppState.customSupplements.push(customSupplement);
+            
+            // Add to my supplements
+            AppState.mySupplements.push(name);
+            
+            saveToStorage();
+            renderMySupplements();
+            showNotification('✅ Eigenes Supplement hinzugefügt!');
+        }
+
+        function renderMySupplements() {
+            const container = document.getElementById('my-supplements-list');
+            
+            if (AppState.mySupplements.length === 0) {
+                container.innerHTML = '<p class="empty-supplements">Noch keine Supplements hinzugefügt. Wähle unten aus der Liste aus.</p>';
+                return;
+            }
+            
+            const mySupplementsData = [];
+            
+            // Add supplements from main list
+            AppState.mySupplements.forEach(name => {
+                const supplement = SUPPLEMENTS_DATA.find(s => s.name === name);
+                if (supplement) {
+                    mySupplementsData.push(supplement);
+                }
+            });
+            
+            // Add custom supplements
+            if (AppState.customSupplements) {
+                AppState.customSupplements.forEach(custom => {
+                    if (AppState.mySupplements.includes(custom.name)) {
+                        mySupplementsData.push(custom);
+                    }
+                });
+            }
+            
+            container.innerHTML = mySupplementsData.map(supplement => `
+                <div class="my-supplement-item">
+                    <div class="my-supplement-info">
+                        <div class="my-supplement-name">${supplement.name}</div>
+                        <div class="my-supplement-dosage">${supplement.dosage}</div>
+                    </div>
+                    <button class="btn-remove" onclick="removeMySupplement('${supplement.name}')">
+                        Entfernen
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function removeMySupplement(name) {
+            const index = AppState.mySupplements.indexOf(name);
+            if (index > -1) {
+                AppState.mySupplements.splice(index, 1);
+            }
+            
+            // Remove from custom supplements if it's custom
+            if (AppState.customSupplements) {
+                AppState.customSupplements = AppState.customSupplements.filter(s => s.name !== name);
+            }
+            
+            saveToStorage();
+            renderMySupplements();
+            filterSupplements(document.querySelector('.filter-btn.active').dataset.filter);
+            showNotification('❌ Supplement entfernt');
         }
 
         // Progress Tracking
