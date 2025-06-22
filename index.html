@@ -1532,6 +1532,7 @@
             timerTime: 90 * 60, // 90 minutes in seconds
             timerInterval: null,
             timerRunning: false,
+            timerStartTime: null,
             userData: {
                 name: '',
                 age: 25,
@@ -1864,17 +1865,80 @@
 
             // Setup service worker for PWA
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('/sw.js');
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('Service Worker registered successfully:', registration);
+                        
+                        // Request notification permission
+                        if ('Notification' in window && Notification.permission === 'default') {
+                            Notification.requestPermission().then(permission => {
+                                console.log('Notification permission:', permission);
+                            });
+                        }
+                        
+                        // Register for background sync
+                        if ('sync' in window.ServiceWorkerRegistration.prototype) {
+                            registration.sync.register('background-sync');
+                        }
+                        
+                        // Register for periodic background sync (timer notifications)
+                        if ('periodicSync' in window.ServiceWorkerRegistration.prototype) {
+                            registration.periodicSync.register('timer-check', {
+                                minInterval: 60000 // Check every minute
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.log('Service Worker registration failed:', error);
+                    });
             }
 
-            // Setup install prompt
+            // Enhanced PWA installation prompt
             let deferredPrompt;
             window.addEventListener('beforeinstallprompt', (e) => {
                 e.preventDefault();
                 deferredPrompt = e;
-                document.getElementById('install-app').classList.remove('hidden');
+                
+                // Show custom install button
+                const installButton = document.createElement('button');
+                installButton.textContent = '📱 App installieren';
+                installButton.className = 'btn-primary install-prompt';
+                installButton.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    z-index: 10000;
+                    animation: bounce 2s infinite;
+                `;
+                
+                installButton.addEventListener('click', () => {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then((choiceResult) => {
+                        if (choiceResult.outcome === 'accepted') {
+                            console.log('User accepted the install prompt');
+                        }
+                        deferredPrompt = null;
+                        installButton.remove();
+                    });
+                });
+                
+                document.body.appendChild(installButton);
+                
+                // Also show existing install button if present
+                const existingInstallBtn = document.getElementById('install-app');
+                if (existingInstallBtn) {
+                    existingInstallBtn.classList.remove('hidden');
+                }
+                
+                // Remove button after 10 seconds if not clicked
+                setTimeout(() => {
+                    if (installButton.parentNode) {
+                        installButton.remove();
+                    }
+                }, 10000);
             });
 
+            // Install button handler (deferredPrompt already declared above)
             document.getElementById('install-app').addEventListener('click', async () => {
                 if (deferredPrompt) {
                     deferredPrompt.prompt();
@@ -2009,6 +2073,7 @@
         function startTimer() {
             if (!AppState.timerRunning) {
                 AppState.timerRunning = true;
+                AppState.timerStartTime = Date.now();
                 AppState.timerInterval = setInterval(() => {
                     AppState.timerTime--;
                     updateTimerDisplay();
@@ -2016,6 +2081,18 @@
                     if (AppState.timerTime <= 0) {
                         pauseTimer();
                         showNotification('⏰ 90-Minuten Timer beendet! Zeit für eine Pause.');
+                        
+                        // Send browser notification even when app is in background
+                        if ('Notification' in window && Notification.permission === 'granted') {
+                            new Notification('LifeOptima Timer', {
+                                body: '90 Minuten sind vorbei! Zeit für eine Pause.',
+                                icon: '/icon-192x192.png',
+                                tag: 'timer-complete',
+                                requireInteraction: true,
+                                vibrate: [200, 100, 200]
+                            });
+                        }
+                        
                         AppState.timerTime = 90 * 60;
                         updateTimerDisplay();
                     }
@@ -2023,6 +2100,13 @@
                 
                 document.getElementById('timer-start').classList.add('hidden');
                 document.getElementById('timer-pause').classList.remove('hidden');
+                
+                // Store timer data for service worker
+                localStorage.setItem('timerData', JSON.stringify({
+                    startTime: AppState.timerStartTime,
+                    duration: 90 * 60,
+                    running: true
+                }));
             }
         }
 
@@ -2031,6 +2115,14 @@
             clearInterval(AppState.timerInterval);
             document.getElementById('timer-start').classList.remove('hidden');
             document.getElementById('timer-pause').classList.add('hidden');
+            
+            // Update timer data in localStorage
+            localStorage.setItem('timerData', JSON.stringify({
+                startTime: AppState.timerStartTime,
+                duration: 90 * 60,
+                running: false,
+                remainingTime: AppState.timerTime
+            }));
         }
 
         function resetTimer() {
