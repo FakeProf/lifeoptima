@@ -280,6 +280,25 @@
             line-height: 1.2;
         }
 
+        .steps-display {
+            background: linear-gradient(135deg, var(--secondary-500), var(--secondary-600));
+            color: white;
+            padding: var(--space-3) var(--space-5);
+            border-radius: var(--radius-lg);
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            box-shadow: var(--shadow-md);
+        }
+        .steps-status {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+        .steps-status.connected::before { content: '✓'; }
+        .steps-status.disconnected::before { content: '⚠'; }
+
         .streak-display {
             background: linear-gradient(135deg, var(--secondary-500) 0%, var(--secondary-600) 100%);
             color: white;
@@ -1242,6 +1261,15 @@
             gap: 15px;
         }
 
+        .auth-section { margin-top: 0; }
+        .auth-hint { font-size: 0.9rem; color: var(--neutral-600); margin-bottom: 1rem; }
+        .auth-buttons { display: flex; gap: 0.75rem; margin-top: 1rem; flex-wrap: wrap; }
+        .auth-message { margin-top: 0.75rem; font-size: 0.9rem; }
+        .auth-message.error { color: #ef4444; }
+        .auth-message.success { color: var(--secondary-600); }
+        .auth-email, .auth-sync-hint { margin-bottom: 0.5rem; font-size: 0.95rem; }
+        .auth-sync-hint { color: var(--neutral-600); font-size: 0.85rem; }
+
         .setting-item {
             display: flex;
             justify-content: space-between;
@@ -1526,15 +1554,41 @@
         <div id="home" class="screen hidden">
             <header class="screen-header">
                 <h1>🏠 Home</h1>
-                <div class="streak-display">
-                    <span id="current-streak">0</span> Tage Streak
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+                    <div class="streak-display">
+                        <span id="current-streak">0</span> Tage Streak
+                    </div>
+                    <div class="steps-display">
+                        <span id="current-steps">-</span> Schritte
+                        <span id="steps-status" class="steps-status" title="Google Fit Status"></span>
+                    </div>
                 </div>
             </header>
             
+            <!-- Gesundheitstipps direkt unter Streak -->
+            <div class="card">
+                <h2>💡 Gesundheitstipps</h2>
+                <div id="daily-tip-badge" class="daily-tip-badge">📅 Tipp des Tages</div>
+                <div class="tip-container">
+                    <div id="daily-tip" class="health-tip">
+                        Trinke direkt nach dem Aufwachen 500ml Wasser, um den Stoffwechsel anzukurbeln.
+                    </div>
+                    <div class="tip-controls">
+                        <div class="tip-counter">
+                            <span id="tip-current">1</span> / <span id="tip-total">48</span>
+                        </div>
+                        <div class="tip-buttons">
+                            <button id="daily-tip-btn" class="btn-tip btn-tip-daily">📅 Heute</button>
+                            <button id="random-tip" class="btn-tip">🎲 Zufällig</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="content">
                 <!-- Water Tracking -->
                 <div class="card">
-                    <h2>💧 Wasser Tracking</h2>
+                    <h2>�� Wasser Tracking</h2>
                     <div class="water-progress">
                         <div class="water-amount">
                             <span id="water-current">0</span> / <span id="water-target">2500</span> ml
@@ -1559,26 +1613,6 @@
                             <button id="timer-start" class="btn-primary">Start</button>
                             <button id="timer-pause" class="btn-secondary hidden">Pause</button>
                             <button id="timer-reset" class="btn-secondary">Reset</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Health Tips -->
-                <div class="card">
-                    <h2>💡 Gesundheitstipps</h2>
-                    <div id="daily-tip-badge" class="daily-tip-badge">📅 Tipp des Tages</div>
-                    <div class="tip-container">
-                        <div id="daily-tip" class="health-tip">
-                            Trinke direkt nach dem Aufwachen 500ml Wasser, um den Stoffwechsel anzukurbeln.
-                        </div>
-                        <div class="tip-controls">
-                            <div class="tip-counter">
-                                <span id="tip-current">1</span> / <span id="tip-total">48</span>
-                            </div>
-                            <div class="tip-buttons">
-                                <button id="daily-tip-btn" class="btn-tip btn-tip-daily">📅 Heute</button>
-                                <button id="random-tip" class="btn-tip">🎲 Zufällig</button>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -1736,6 +1770,48 @@
                     </div>
                 </div>
 
+                <!-- Konto / Anmeldung -->
+                <div class="card" id="auth-card">
+                    <h2>🔐 Konto</h2>
+                    <div id="auth-logged-out" class="auth-section">
+                        <p class="auth-hint">Melde dich an, damit deine Daten (Profil, Fortschritt, Tagesplan) in der Cloud gespeichert und auf allen Geräten verfügbar sind.</p>
+                        <div class="input-group">
+                            <label>E-Mail</label>
+                            <input type="email" id="auth-email" placeholder="deine@email.de" autocomplete="email">
+                        </div>
+                        <div class="input-group">
+                            <label>Passwort</label>
+                            <input type="password" id="auth-password" placeholder="••••••••" autocomplete="current-password">
+                        </div>
+                        <div class="auth-buttons">
+                            <button type="button" id="auth-login" class="btn-primary">Anmelden</button>
+                            <button type="button" id="auth-register" class="btn-secondary">Konto erstellen</button>
+                        </div>
+                        <p id="auth-message" class="auth-message hidden"></p>
+                    </div>
+                    <div id="auth-logged-in" class="auth-section hidden">
+                        <p class="auth-email"><strong>Angemeldet als:</strong> <span id="auth-email-display"></span></p>
+                        <p class="auth-sync-hint">Daten werden automatisch mit dem Server synchronisiert.</p>
+                        <button type="button" id="auth-logout" class="btn-secondary">Abmelden</button>
+                    </div>
+                </div>
+
+                <!-- Google Fit Integration -->
+                <div class="card" id="google-fit-card">
+                    <h2>👟 Google Fit</h2>
+                    <div id="google-fit-disconnected" class="auth-section">
+                        <p class="auth-hint">Verbinde Google Fit, um deine Schrittzahl automatisch zu synchronisieren. Funktioniert auch mit Samsung Health, wenn du Samsung Health → Google Fit Sync aktiviert hast.</p>
+                        <button type="button" id="google-fit-connect" class="btn-primary">🔗 Google Fit verbinden</button>
+                        <p id="google-fit-message" class="auth-message hidden"></p>
+                    </div>
+                    <div id="google-fit-connected" class="auth-section hidden">
+                        <p class="auth-email"><strong>Verbunden mit Google Fit</strong></p>
+                        <p class="auth-sync-hint">Schrittzahl wird automatisch synchronisiert.</p>
+                        <button type="button" id="google-fit-disconnect" class="btn-secondary">Verbindung trennen</button>
+                        <button type="button" id="google-fit-refresh" class="btn-secondary" style="margin-top: 0.5rem;">🔄 Aktualisieren</button>
+                    </div>
+                </div>
+
                 <!-- Settings -->
                 <div class="card">
                     <h2>Einstellungen</h2>
@@ -1753,12 +1829,17 @@
     </div>
 
     <script>
+        // Backend-URL (für API und Push)
+        const BACKEND_URL = window.location.protocol === 'https:' ? 'https://lifeoptima-push.herokuapp.com' : 'http://localhost:4000';
+
         // App State
         const AppState = {
             currentScreen: 'loading',
             waterIntake: 0,
             waterTarget: 2500,
             currentStreak: 0,
+            currentSteps: 0,
+            googleFitConnected: false,
             timerTime: 90 * 60, // 90 minutes in seconds
             timerInterval: null,
             timerRunning: false,
@@ -1782,12 +1863,12 @@
             customSchedule: null,
             scheduleEditMode: false,
             scheduleNotifications: {},
-            currentTipIndex: 0
+            currentTipIndex: 0,
+            supplementNotifications: {}
         };
 
         // Scientific data
         const SUPPLEMENTS_DATA = [
-            // HÖCHSTE PRIORITÄT (Grundversorgung)
             {
                 name: 'Vitamin D3',
                 category: 'recovery',
@@ -1795,7 +1876,8 @@
                 dosage: '2000-4000 IU täglich',
                 evidence: 'Hochgradig evidenzbasiert',
                 priority: 1,
-                importance: '🔴 KRITISCH - 90% der Menschen haben Mangel'
+                importance: '🔴 KRITISCH - 90% der Menschen haben Mangel',
+                bestTime: 'morgens mit fetthaltiger Mahlzeit'
             },
             {
                 name: 'Omega-3 (EPA/DHA)',
@@ -1804,7 +1886,8 @@
                 dosage: '1000-2000mg EPA/DHA täglich',
                 evidence: 'Hochgradig evidenzbasiert',
                 priority: 1,
-                importance: '🔴 KRITISCH - Essentiell für Gehirn & Herz'
+                importance: '🔴 KRITISCH - Essentiell für Gehirn & Herz',
+                bestTime: 'zu einer Hauptmahlzeit mit Fett'
             },
             {
                 name: 'Magnesium',
@@ -1813,10 +1896,9 @@
                 dosage: '200-400mg vor dem Schlafengehen',
                 evidence: 'Hochgradig evidenzbasiert',
                 priority: 1,
-                importance: '🔴 KRITISCH - 70% haben Mangel'
+                importance: '🔴 KRITISCH - 70% haben Mangel',
+                bestTime: 'abends, vor dem Schlafen'
             },
-            
-            // HOHE PRIORITÄT (Performance & Gesundheit)
             {
                 name: 'Kreatin Monohydrat',
                 category: 'performance',
@@ -1824,7 +1906,8 @@
                 dosage: '3-5g täglich',
                 evidence: 'Hochgradig evidenzbasiert',
                 priority: 2,
-                importance: '🟠 HOCH - Beste Performance-Ergänzung'
+                importance: '🟠 HOCH - Beste Performance-Ergänzung',
+                bestTime: 'beliebig, aber täglich (z.B. morgens)'
             },
             {
                 name: 'Vitamin B12',
@@ -1833,7 +1916,8 @@
                 dosage: '250-1000mcg täglich',
                 evidence: 'Hochgradig evidenzbasiert',
                 priority: 2,
-                importance: '🟠 HOCH - Kritisch bei veganer Ernährung'
+                importance: '🟠 HOCH - Kritisch bei veganer Ernährung',
+                bestTime: 'morgens, nüchtern oder mit Frühstück'
             },
             {
                 name: 'Zink',
@@ -1842,7 +1926,8 @@
                 dosage: '8-11mg täglich mit Nahrung',
                 evidence: 'Hochgradig evidenzbasiert',
                 priority: 2,
-                importance: '🟠 HOCH - Immunsystem & Hormone'
+                importance: '🟠 HOCH - Immunsystem & Hormone',
+                bestTime: 'abends, nicht mit Eisen oder Calcium'
             },
             {
                 name: 'Vitamin K2 (MK-7)',
@@ -1851,10 +1936,9 @@
                 dosage: '100-200mcg täglich',
                 evidence: 'Gut evidenzbasiert',
                 priority: 2,
-                importance: '🟠 HOCH - Synergistisch mit Vitamin D3'
+                importance: '🟠 HOCH - Synergistisch mit Vitamin D3',
+                bestTime: 'mit Vitamin D3, morgens oder mittags'
             },
-            
-            // MITTLERE PRIORITÄT (Optimierung)
             {
                 name: 'Ashwagandha',
                 category: 'cognitive',
@@ -1862,7 +1946,8 @@
                 dosage: '300-600mg täglich',
                 evidence: 'Gut evidenzbasiert',
                 priority: 3,
-                importance: '🟡 MITTEL - Stressmanagement'
+                importance: '🟡 MITTEL - Stressmanagement',
+                bestTime: 'abends, vor dem Schlafen'
             },
             {
                 name: 'Rhodiola Rosea',
@@ -1871,7 +1956,8 @@
                 dosage: '200-400mg am Morgen',
                 evidence: 'Moderat evidenzbasiert',
                 priority: 3,
-                importance: '🟡 MITTEL - Mentale Performance'
+                importance: '🟡 MITTEL - Mentale Performance',
+                bestTime: 'morgens, nüchtern oder mit Frühstück'
             },
             {
                 name: 'Curcumin (mit Piperin)',
@@ -1880,7 +1966,8 @@
                 dosage: '500-1000mg täglich mit Piperin',
                 evidence: 'Gut evidenzbasiert',
                 priority: 3,
-                importance: '🟡 MITTEL - Entzündungshemmung'
+                importance: '🟡 MITTEL - Entzündungshemmung',
+                bestTime: 'zu einer fetthaltigen Mahlzeit'
             },
             {
                 name: 'Probiotika',
@@ -1889,7 +1976,8 @@
                 dosage: '10-50 Milliarden CFU täglich',
                 evidence: 'Gut evidenzbasiert',
                 priority: 3,
-                importance: '🟡 MITTEL - Darmgesundheit'
+                importance: '🟡 MITTEL - Darmgesundheit',
+                bestTime: 'morgens, nüchtern oder 30 Min vor dem Essen'
             },
             {
                 name: 'Melatonin',
@@ -1898,10 +1986,9 @@
                 dosage: '0.5-3mg 30 Min vor dem Schlafengehen',
                 evidence: 'Hochgradig evidenzbasiert',
                 priority: 3,
-                importance: '🟡 MITTEL - Nur bei Schlafproblemen'
+                importance: '🟡 MITTEL - Nur bei Schlafproblemen',
+                bestTime: '30 Min vor dem Schlafen'
             },
-            
-            // NIEDRIGE PRIORITÄT (Speziell/Optional)
             {
                 name: 'L-Theanin',
                 category: 'cognitive',
@@ -1909,7 +1996,8 @@
                 dosage: '100-200mg bei Bedarf',
                 evidence: 'Moderat evidenzbasiert',
                 priority: 4,
-                importance: '🟢 NIEDRIG - Entspannung & Fokus'
+                importance: '🟢 NIEDRIG - Entspannung & Fokus',
+                bestTime: 'bei Bedarf, mit Koffein morgens/mittags'
             },
             {
                 name: 'Alpha-GPC',
@@ -1918,16 +2006,18 @@
                 dosage: '300-600mg täglich',
                 evidence: 'Moderat evidenzbasiert',
                 priority: 4,
-                importance: '🟢 NIEDRIG - Kognitive Leistung'
+                importance: '🟢 NIEDRIG - Kognitive Leistung',
+                bestTime: 'morgens oder vor geistiger Leistung'
             },
             {
-                name: 'Lion\'s Mane',
+                name: "Lion's Mane",
                 category: 'cognitive',
                 description: 'Heilpilz zur Unterstützung der Neurogenese und kognitiven Funktion.',
                 dosage: '500-1000mg täglich',
                 evidence: 'Moderat evidenzbasiert',
                 priority: 4,
-                importance: '🟢 NIEDRIG - Neuroplastizität'
+                importance: '🟢 NIEDRIG - Neuroplastizität',
+                bestTime: 'morgens oder mittags'
             },
             {
                 name: 'Coenzym Q10',
@@ -1936,7 +2026,8 @@
                 dosage: '100-200mg täglich mit Fett',
                 evidence: 'Gut evidenzbasiert',
                 priority: 4,
-                importance: '🟢 NIEDRIG - Ab 40+ Jahren'
+                importance: '🟢 NIEDRIG - Ab 40+ Jahren',
+                bestTime: 'zu einer fetthaltigen Mahlzeit'
             },
             {
                 name: 'Kollagen',
@@ -1945,7 +2036,8 @@
                 dosage: '10-20g täglich',
                 evidence: 'Moderat evidenzbasiert',
                 priority: 4,
-                importance: '🟢 NIEDRIG - Gelenke & Haut'
+                importance: '🟢 NIEDRIG - Gelenke & Haut',
+                bestTime: 'morgens oder nach dem Training'
             },
             {
                 name: 'Berberin',
@@ -1954,7 +2046,8 @@
                 dosage: '500mg 2-3x täglich vor Mahlzeiten',
                 evidence: 'Gut evidenzbasiert',
                 priority: 4,
-                importance: '🟢 NIEDRIG - Blutzuckermanagement'
+                importance: '🟢 NIEDRIG - Blutzuckermanagement',
+                bestTime: 'vor den Hauptmahlzeiten'
             },
             {
                 name: 'NAD+ Booster (NMN/NR)',
@@ -1963,7 +2056,8 @@
                 dosage: '250-500mg täglich',
                 evidence: 'Experimentell',
                 priority: 4,
-                importance: '🟢 NIEDRIG - Experimentell/Teuer'
+                importance: '🟢 NIEDRIG - Experimentell/Teuer',
+                bestTime: 'morgens, nüchtern'
             }
         ];
 
@@ -2075,10 +2169,298 @@
             { id: 'balance', icon: '⚖️', title: 'Work-Life-Balance', description: 'Ausgewogener Alltag' }
         ];
 
+        // ---------- Auth & Cloud-Sync ----------
+        const AUTH_TOKEN_KEY = 'lifeOptima_token';
+        const AUTH_USER_KEY = 'lifeOptima_user';
+        let syncToServerTimeout = null;
+
+        function getAuthToken() { return localStorage.getItem(AUTH_TOKEN_KEY); }
+        function getAuthUser() { try { return JSON.parse(localStorage.getItem(AUTH_USER_KEY) || 'null'); } catch { return null; } }
+        function setAuth(token, user) {
+            localStorage.setItem(AUTH_TOKEN_KEY, token);
+            localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user || {}));
+            updateAuthUI();
+        }
+        function clearAuth() {
+            localStorage.removeItem(AUTH_TOKEN_KEY);
+            localStorage.removeItem(AUTH_USER_KEY);
+            updateAuthUI();
+        }
+
+        function updateAuthUI() {
+            const loggedIn = !!getAuthToken();
+            const authOut = document.getElementById('auth-logged-out');
+            const authIn = document.getElementById('auth-logged-in');
+            const emailDisplay = document.getElementById('auth-email-display');
+            if (authOut && authIn) {
+                if (loggedIn) {
+                    authOut.classList.add('hidden');
+                    authIn.classList.remove('hidden');
+                    const user = getAuthUser();
+                    if (emailDisplay) emailDisplay.textContent = user?.email || '';
+                } else {
+                    authOut.classList.remove('hidden');
+                    authIn.classList.add('hidden');
+                    if (emailDisplay) emailDisplay.textContent = '';
+                }
+            }
+            const msg = document.getElementById('auth-message');
+            if (msg) { msg.classList.add('hidden'); msg.textContent = ''; }
+        }
+
+        function showAuthMessage(text, isError) {
+            const msg = document.getElementById('auth-message');
+            if (!msg) return;
+            msg.textContent = text;
+            msg.classList.remove('hidden', 'error', 'success');
+            msg.classList.add(isError ? 'error' : 'success');
+        }
+
+        async function fetchUserData() {
+            const token = getAuthToken();
+            if (!token) return;
+            try {
+                const res = await fetch(BACKEND_URL + '/api/me/data', {
+                    headers: { Authorization: 'Bearer ' + token }
+                });
+                if (!res.ok) { if (res.status === 401) clearAuth(); return; }
+                const data = await res.json();
+                if (data.appState && typeof data.appState === 'object') {
+                    Object.assign(AppState, data.appState);
+                    if (AppState.dailyData && !AppState.dailyData.date) {
+                        const today = new Date().toISOString().split('T')[0];
+                        AppState.dailyData = { ...AppState.dailyData, date: today };
+                    }
+                }
+                if (Array.isArray(data.dailyHistory)) {
+                    localStorage.setItem('dailyHistory', JSON.stringify(data.dailyHistory));
+                }
+            } catch (err) {
+                console.error('fetchUserData:', err);
+            }
+        }
+
+        function syncToServer() {
+            const token = getAuthToken();
+            if (!token) return;
+            const appState = { ...AppState };
+            delete appState.timerInterval;
+            const dailyHistory = JSON.parse(localStorage.getItem('dailyHistory') || '[]');
+            fetch(BACKEND_URL + '/api/me/data', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+                body: JSON.stringify({ appState, dailyHistory })
+            }).catch(err => console.error('syncToServer:', err));
+        }
+
+        function syncToServerDebounced() {
+            if (syncToServerTimeout) clearTimeout(syncToServerTimeout);
+            syncToServerTimeout = setTimeout(syncToServer, 1500);
+        }
+
+        async function doLogin() {
+            const email = document.getElementById('auth-email')?.value?.trim();
+            const password = document.getElementById('auth-password')?.value;
+            if (!email || !password) { showAuthMessage('E-Mail und Passwort eingeben.', true); return; }
+            showAuthMessage('Anmeldung …', false);
+            try {
+                const res = await fetch(BACKEND_URL + '/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) { showAuthMessage(data.error || 'Anmeldung fehlgeschlagen', true); return; }
+                setAuth(data.token, data.user);
+                await fetchUserData();
+                showAuthMessage('Angemeldet. Daten geladen.', false);
+                syncAppStateToProfileForm();
+                await checkGoogleFitStatus();
+                updateStepsDisplay();
+                renderGoals(); updateWaterDisplay(); updateBMI(); updateDailyInputs(); renderSchedule(); renderMySupplements();
+            } catch (err) {
+                showAuthMessage('Netzwerkfehler.', true);
+            }
+        }
+
+        async function doRegister() {
+            const email = document.getElementById('auth-email')?.value?.trim();
+            const password = document.getElementById('auth-password')?.value;
+            if (!email || !password) { showAuthMessage('E-Mail und Passwort eingeben.', true); return; }
+            if (password.length < 6) { showAuthMessage('Passwort mindestens 6 Zeichen.', true); return; }
+            showAuthMessage('Konto wird erstellt …', false);
+            try {
+                const res = await fetch(BACKEND_URL + '/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) { showAuthMessage(data.error || 'Registrierung fehlgeschlagen', true); return; }
+                setAuth(data.token, data.user);
+                syncToServer();
+                showAuthMessage('Konto erstellt. Lokale Daten werden hochgeladen.', false);
+            } catch (err) {
+                showAuthMessage('Netzwerkfehler.', true);
+            }
+        }
+
+        function doLogout() {
+            clearAuth();
+            document.getElementById('auth-email').value = '';
+            document.getElementById('auth-password').value = '';
+            AppState.googleFitConnected = false;
+            updateGoogleFitUI();
+        }
+
+        // ---------- Google Fit Integration ----------
+        function updateGoogleFitUI() {
+            const connected = AppState.googleFitConnected;
+            const disconnectedEl = document.getElementById('google-fit-disconnected');
+            const connectedEl = document.getElementById('google-fit-connected');
+            if (disconnectedEl && connectedEl) {
+                if (connected) {
+                    disconnectedEl.classList.add('hidden');
+                    connectedEl.classList.remove('hidden');
+                } else {
+                    disconnectedEl.classList.remove('hidden');
+                    connectedEl.classList.add('hidden');
+                }
+            }
+            const statusEl = document.getElementById('steps-status');
+            if (statusEl) {
+                statusEl.className = 'steps-status ' + (connected ? 'connected' : 'disconnected');
+            }
+        }
+
+        async function checkGoogleFitStatus() {
+            const token = getAuthToken();
+            if (!token) return;
+            try {
+                const res = await fetch(BACKEND_URL + '/api/google-fit/status', {
+                    headers: { Authorization: 'Bearer ' + token }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    AppState.googleFitConnected = data.connected;
+                    updateGoogleFitUI();
+                    if (data.connected) {
+                        loadSteps();
+                    }
+                }
+            } catch (err) {
+                console.error('checkGoogleFitStatus:', err);
+            }
+        }
+
+        async function connectGoogleFit() {
+            const token = getAuthToken();
+            if (!token) {
+                showGoogleFitMessage('Bitte zuerst anmelden.', true);
+                return;
+            }
+            try {
+                const res = await fetch(BACKEND_URL + '/api/google-fit/auth', {
+                    headers: { Authorization: 'Bearer ' + token }
+                });
+                const text = await res.text();
+                let data = {};
+                try { data = JSON.parse(text); } catch (_) { /* Server antwortet nicht mit JSON */ }
+                if (!res.ok) {
+                    showGoogleFitMessage(data.error || 'Server-Fehler: ' + res.status, true);
+                    return;
+                }
+                if (data.authUrl) {
+                    window.location.href = data.authUrl;
+                } else if (data.error) {
+                    showGoogleFitMessage(data.error, true);
+                } else {
+                    showGoogleFitMessage('Google Fit nicht konfiguriert. GOOGLE_CLIENT_ID in .env setzen.', true);
+                }
+            } catch (err) {
+                console.error('Google Fit connect:', err);
+                showGoogleFitMessage('Netzwerkfehler. Backend läuft? ' + err.message, true);
+            }
+        }
+
+        async function disconnectGoogleFit() {
+            const token = getAuthToken();
+            if (!token) return;
+            try {
+                const res = await fetch(BACKEND_URL + '/api/google-fit/disconnect', {
+                    method: 'DELETE',
+                    headers: { Authorization: 'Bearer ' + token }
+                });
+                if (res.ok) {
+                    AppState.googleFitConnected = false;
+                    AppState.currentSteps = 0;
+                    updateGoogleFitUI();
+                    updateStepsDisplay();
+                    showGoogleFitMessage('Google Fit getrennt.', false);
+                }
+            } catch (err) {
+                showGoogleFitMessage('Fehler beim Trennen.', true);
+            }
+        }
+
+        async function loadSteps() {
+            const token = getAuthToken();
+            if (!token || !AppState.googleFitConnected) return;
+            try {
+                const res = await fetch(BACKEND_URL + '/api/google-fit/steps', {
+                    headers: { Authorization: 'Bearer ' + token }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    AppState.currentSteps = data.steps || 0;
+                    updateStepsDisplay();
+                } else if (res.status === 404) {
+                    AppState.googleFitConnected = false;
+                    updateGoogleFitUI();
+                } else if (res.status === 401) {
+                    AppState.googleFitConnected = false;
+                    updateGoogleFitUI();
+                    showGoogleFitMessage('Verbindung abgelaufen. Bitte erneut verbinden.', true);
+                }
+            } catch (err) {
+                console.error('loadSteps:', err);
+            }
+        }
+
+        function updateStepsDisplay() {
+            const stepsEl = document.getElementById('current-steps');
+            if (stepsEl) {
+                stepsEl.textContent = AppState.currentSteps > 0 ? AppState.currentSteps.toLocaleString('de-DE') : '-';
+            }
+        }
+
+        function showGoogleFitMessage(text, isError) {
+            const msg = document.getElementById('google-fit-message');
+            if (!msg) return;
+            msg.textContent = text;
+            msg.classList.remove('hidden', 'error', 'success');
+            msg.classList.add(isError ? 'error' : 'success');
+            setTimeout(() => {
+                msg.classList.add('hidden');
+            }, 5000);
+        }
+
         // Initialize App
         function initApp() {
             loadFromStorage();
             setupEventListeners();
+            if (getAuthToken()) {
+                fetchUserData().then(async () => {
+                    syncAppStateToProfileForm();
+                    await checkGoogleFitStatus();
+                    updateStepsDisplay();
+                    renderGoals(); updateWaterDisplay(); updateBMI(); updateDailyInputs(); renderSchedule(); renderMySupplements();
+                });
+            }
+            updateAuthUI();
+            syncAppStateToProfileForm();
+            checkGoogleFitStatus();
+            updateStepsDisplay();
             renderSupplements();
             renderMySupplements();
             renderSchedule();
@@ -2089,6 +2471,21 @@
             updateDailyInputs();
             showDailyTip();
             
+            // Prüfe Google Fit Callback
+            const urlParams = new URLSearchParams(window.location.search);
+            const googleFitStatus = urlParams.get('google-fit');
+            if (googleFitStatus === 'connected') {
+                AppState.googleFitConnected = true;
+                updateGoogleFitUI();
+                loadSteps();
+                showNotification('✅ Google Fit erfolgreich verbunden!');
+                // URL bereinigen
+                window.history.replaceState({}, '', window.location.pathname);
+            } else if (googleFitStatus === 'error') {
+                showNotification('❌ Google Fit Verbindung fehlgeschlagen.');
+                window.history.replaceState({}, '', window.location.pathname);
+            }
+
             // Show loading screen for 2 seconds
             setTimeout(() => {
                 document.getElementById('loading').style.display = 'none';
@@ -2096,6 +2493,13 @@
                 showScreen('home');
                 updateNavigation('home');
             }, 2000);
+
+            // Automatisches Laden der Schrittzahl alle 5 Minuten
+            setInterval(() => {
+                if (AppState.googleFitConnected && getAuthToken()) {
+                    loadSteps();
+                }
+            }, 5 * 60 * 1000);
 
             // Setup service worker for PWA
             if ('serviceWorker' in navigator) {
@@ -2240,6 +2644,16 @@
             document.getElementById('user-weight').addEventListener('input', updateBMI);
             document.getElementById('user-name').addEventListener('input', saveUserData);
             document.getElementById('user-age').addEventListener('input', saveUserData);
+
+            // Auth
+            document.getElementById('auth-login').addEventListener('click', doLogin);
+            document.getElementById('auth-register').addEventListener('click', doRegister);
+            document.getElementById('auth-logout').addEventListener('click', doLogout);
+
+            // Google Fit
+            document.getElementById('google-fit-connect').addEventListener('click', connectGoogleFit);
+            document.getElementById('google-fit-disconnect').addEventListener('click', disconnectGoogleFit);
+            document.getElementById('google-fit-refresh').addEventListener('click', loadSteps);
 
             // Settings
             document.getElementById('notifications-enabled').addEventListener('change', toggleNotifications);
@@ -2406,6 +2820,10 @@
                                     <input type="checkbox" class="edit-notification" data-index="${index}" ${AppState.scheduleNotifications[`${item.time}-${item.activity}`] ? 'checked' : ''}>
                                     Benachrichtigung
                                 </label>
+                                <label>
+                                    <input type="checkbox" class="edit-repeat" data-index="${index}" ${item.repeat ? 'checked' : ''}>
+                                    Täglich wiederholen
+                                </label>
                             </div>
                         </div>
                     </div>
@@ -2463,6 +2881,7 @@
                     <div class="supplement-description">${supplement.description}</div>
                     <div class="supplement-dosage"><strong>Dosierung:</strong> ${supplement.dosage}</div>
                     <div class="supplement-evidence"><strong>Evidenz:</strong> ${supplement.evidence}</div>
+                    <div class="supplement-besttime"><strong>Beste Einnahmezeit:</strong> ${supplement.bestTime || '-'}</div>
                     <div class="supplement-actions">
                         <button class="btn-add ${AppState.mySupplements.includes(supplement.name) ? 'added' : ''}" 
                                 onclick="toggleSupplement('${supplement.name}')">
@@ -2548,17 +2967,29 @@
                 });
             }
             
-            container.innerHTML = mySupplementsData.map(supplement => `
-                <div class="my-supplement-item">
-                    <div class="my-supplement-info">
-                        <div class="my-supplement-name">${supplement.name}</div>
-                        <div class="my-supplement-dosage">${supplement.dosage}</div>
+            container.innerHTML = mySupplementsData.map(supplement => {
+                // Benachrichtigungsstatus prüfen
+                const notifKey = `supplement-${supplement.name}`;
+                const notif = AppState.supplementNotifications && AppState.supplementNotifications[notifKey];
+                let notifText = '';
+                if (notif) {
+                    notifText = `<div class='notification-indicator'>🔔 Benachrichtigung um <strong>${notif.time} Uhr${notif.repeat ? ' (täglich)' : ''}</strong></div>`;
+                }
+                return `
+                    <div class="my-supplement-item">
+                        <div class="my-supplement-info">
+                            <div class="my-supplement-name">${supplement.name}</div>
+                            <div class="my-supplement-dosage">${supplement.dosage || ''}</div>
+                            ${notifText}
+                        </div>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <button class="btn-remove" onclick="removeMySupplement('${supplement.name}')">Entfernen</button>
+                            <button class="btn-secondary" onclick="setSupplementNotification('${supplement.name}')">Benachrichtigung ${notif ? 'ändern' : 'einstellen'}</button>
+                            ${notif ? `<button class='btn-remove' onclick="removeSupplementNotification('${supplement.name}')">🔕</button>` : ''}
+                        </div>
                     </div>
-                    <button class="btn-remove" onclick="removeMySupplement('${supplement.name}')">
-                        Entfernen
-                    </button>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         function removeMySupplement(name) {
@@ -2720,6 +3151,20 @@
             renderGoals();
         }
 
+        function syncAppStateToProfileForm() {
+            const u = AppState.userData || {};
+            const nameEl = document.getElementById('user-name');
+            const ageEl = document.getElementById('user-age');
+            const heightEl = document.getElementById('user-height');
+            const weightEl = document.getElementById('user-weight');
+            const notifEl = document.getElementById('notifications-enabled');
+            if (nameEl) nameEl.value = u.name ?? '';
+            if (ageEl) ageEl.value = u.age ?? 25;
+            if (heightEl) heightEl.value = u.height ?? 175;
+            if (weightEl) weightEl.value = u.weight ?? 70;
+            if (notifEl) notifEl.checked = !!AppState.notifications;
+        }
+
         function updateBMI() {
             const height = parseFloat(document.getElementById('user-height').value);
             const weight = parseFloat(document.getElementById('user-weight').value);
@@ -2820,6 +3265,7 @@
         // Data Management
         function saveToStorage() {
             localStorage.setItem('lifeOptima', JSON.stringify(AppState));
+            if (getAuthToken()) syncToServerDebounced();
         }
 
         function loadFromStorage() {
@@ -2920,40 +3366,90 @@
             }
         }
 
-        function saveSchedule() {
+        // Hilfsfunktion: Push-Subscription holen
+        async function getPushSubscription() {
+            if (!('serviceWorker' in navigator) || !('PushManager' in window)) return null;
+            const reg = await navigator.serviceWorker.getRegistration('./sw-push.js');
+            if (!reg) return null;
+            return await reg.pushManager.getSubscription();
+        }
+
+        // Schedule Functions (Ergänzung in saveSchedule)
+        async function saveSchedule() {
             const scheduleData = AppState.customSchedule || [...SCHEDULE_DATA];
             const updatedSchedule = [];
-            
+
             document.querySelectorAll('.schedule-item.edit-mode').forEach((item, index) => {
                 const time = item.querySelector('.edit-time').value;
                 const activity = item.querySelector('.edit-activity').value;
                 const description = item.querySelector('.edit-description').value;
                 const focus = item.querySelector('.edit-focus').checked;
                 const notification = item.querySelector('.edit-notification').checked;
-                
+                const repeat = item.querySelector('.edit-repeat')?.checked || false;
+
                 const scheduleItem = {
                     time,
                     activity,
                     description,
                     phase: focus ? 'focus' : 'custom',
-                    focus
+                    focus,
+                    repeat
                 };
-                
+
                 updatedSchedule.push(scheduleItem);
-                
+
                 // Handle notifications
                 const notificationKey = `${time}-${activity}`;
                 if (notification) {
                     AppState.scheduleNotifications[notificationKey] = true;
+                    // Push-Benachrichtigung planen (nur wenn Push aktiviert)
+                    if (pushEnabled) {
+                        getPushSubscription().then(pushSub => {
+                            if (pushSub) {
+                                fetch(BACKEND_URL + '/schedule-push', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        subscription: pushSub,
+                                        time: time.substring(0,5), // HH:MM
+                                        title: 'LifeOptima Tagesplan',
+                                        message: `${activity} - Es ist ${time} Uhr!`,
+                                        activity,
+                                        repeat
+                                    })
+                                }).catch(error => {
+                                    console.error('Push-Backend Fehler:', error);
+                                });
+                            }
+                        });
+                    }
                 } else {
                     delete AppState.scheduleNotifications[notificationKey];
+                    // Push-Benachrichtigung im Backend löschen
+                    if (pushEnabled) {
+                        getPushSubscription().then(pushSub => {
+                            if (pushSub) {
+                                fetch(BACKEND_URL + '/delete-scheduled-push', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        subscription: pushSub,
+                                        time: time.substring(0,5),
+                                        activity
+                                    })
+                                }).catch(error => {
+                                    console.error('Push-Backend Fehler:', error);
+                                });
+                            }
+                        });
+                    }
                 }
             });
-            
+
             // Sort by time
             updatedSchedule.sort((a, b) => a.time.localeCompare(b.time));
             AppState.customSchedule = updatedSchedule;
-            
+
             saveToStorage();
             toggleScheduleEditMode();
             showNotification('📅 Tagesplan gespeichert!');
@@ -2995,6 +3491,163 @@
                     }, timeUntilNotification);
                 }
             });
+        }
+
+        // === PUSH NOTIFICATIONS SETUP ===
+        // BACKEND_URL ist oben im Script definiert
+
+        async function registerPush() {
+            if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+                console.log('Push nicht unterstützt');
+                return false;
+            }
+            try {
+                // Service Worker für Push registrieren
+                const reg = await navigator.serviceWorker.register('./sw-push.js');
+                console.log('Push Service Worker registriert:', reg);
+
+                // VAPID Public Key holen
+                const vapidRes = await fetch(BACKEND_URL + '/vapidPublicKey');
+                if (!vapidRes.ok) {
+                    console.error('Backend nicht erreichbar:', BACKEND_URL);
+                    return false;
+                }
+                const { publicKey } = await vapidRes.json();
+                const convertedKey = urlBase64ToUint8Array(publicKey);
+
+                // Subscription holen/erstellen
+                let sub = await reg.pushManager.getSubscription();
+                if (!sub) {
+                    sub = await reg.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey: convertedKey
+                    });
+                    // An Backend senden
+                    const subscribeRes = await fetch(BACKEND_URL + '/subscribe', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(sub)
+                    });
+                    if (subscribeRes.ok) {
+                        console.log('Push Subscription registriert und an Backend gesendet');
+                        showNotification('🔔 Push-Benachrichtigungen aktiviert!');
+                        return true;
+                    } else {
+                        console.error('Backend-Subscription fehlgeschlagen');
+                        return false;
+                    }
+                } else {
+                    console.log('Push Subscription existiert bereits');
+                    return true;
+                }
+            } catch (err) {
+                console.error('Push Registrierung fehlgeschlagen:', err);
+                // Fallback: Lokale Benachrichtigungen verwenden
+                if (Notification.permission === 'granted') {
+                    showNotification('⚠️ Push-Backend nicht verfügbar, verwende lokale Benachrichtigungen');
+                }
+                return false;
+            }
+        }
+
+        // Hilfsfunktion: VAPID-Key umwandeln
+        function urlBase64ToUint8Array(base64String) {
+            const padding = '='.repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+            const rawData = window.atob(base64);
+            const outputArray = new Uint8Array(rawData.length);
+            for (let i = 0; i < rawData.length; ++i) {
+                outputArray[i] = rawData.charCodeAt(i);
+            }
+            return outputArray;
+        }
+
+        // Testfunktion für Push (nur zu Testzwecken)
+        async function sendTestPush() {
+            await fetch(BACKEND_URL + '/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title: 'Test', message: 'Das ist eine Test-Push-Nachricht von LifeOptima.' })
+            });
+        }
+
+        // Registrierung beim App-Start
+        let pushEnabled = false;
+        registerPush().then(enabled => {
+            pushEnabled = enabled;
+            console.log('Push-Status:', pushEnabled ? 'Aktiviert' : 'Deaktiviert');
+        });
+
+        // Supplement-Benachrichtigung setzen
+        async function setSupplementNotification(name) {
+            if (!AppState.supplementNotifications) AppState.supplementNotifications = {};
+            const time = prompt('Zu welcher Uhrzeit möchtest du an die Einnahme von ' + name + ' erinnert werden? (HH:MM, z.B. 21:00)');
+            if (!time || !/^\d{2}:\d{2}$/.test(time)) return alert('Ungültiges Zeitformat. Beispiel: 21:00');
+            const repeat = confirm('Täglich wiederholen?');
+            
+            if (pushEnabled) {
+                const pushSub = await getPushSubscription();
+                if (pushSub) {
+                    try {
+                        // Im Backend planen
+                        const response = await fetch(BACKEND_URL + '/schedule-push', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                subscription: pushSub,
+                                time,
+                                title: 'Supplement-Erinnerung',
+                                message: `Zeit für ${name}!`,
+                                activity: name,
+                                repeat
+                            })
+                        });
+                        if (!response.ok) {
+                            throw new Error('Backend-Fehler');
+                        }
+                    } catch (error) {
+                        console.error('Push-Backend Fehler:', error);
+                        showNotification('⚠️ Push-Backend nicht verfügbar, verwende lokale Erinnerung');
+                    }
+                }
+            }
+            
+            // Immer lokale Erinnerung setzen (Fallback)
+            AppState.supplementNotifications[`supplement-${name}`] = { time, repeat };
+            saveToStorage();
+            renderMySupplements();
+            showNotification('🔔 Supplement-Erinnerung gespeichert!');
+        }
+
+        // Supplement-Benachrichtigung entfernen
+        async function removeSupplementNotification(name) {
+            if (!AppState.supplementNotifications) AppState.supplementNotifications = {};
+            const notif = AppState.supplementNotifications[`supplement-${name}`];
+            if (!notif) return;
+            
+            if (pushEnabled) {
+                const pushSub = await getPushSubscription();
+                if (pushSub) {
+                    try {
+                        await fetch(BACKEND_URL + '/delete-scheduled-push', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                subscription: pushSub,
+                                time: notif.time,
+                                activity: name
+                            })
+                        });
+                    } catch (error) {
+                        console.error('Push-Backend Fehler beim Löschen:', error);
+                    }
+                }
+            }
+            
+            delete AppState.supplementNotifications[`supplement-${name}`];
+            saveToStorage();
+            renderMySupplements();
+            showNotification('🔕 Supplement-Erinnerung entfernt');
         }
 
         // Start the app
