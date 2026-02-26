@@ -218,7 +218,6 @@
             padding: var(--space-4);
             padding-bottom: 120px !important; /* Extra space for fixed navbar */
             margin: 0;
-            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             /* Mobile optimizations */
             width: 100%;
             max-width: 100vw;
@@ -352,12 +351,6 @@
             right: 0;
             height: 1px;
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
-        }
-
-        .card:active {
-            transform: scale(0.98);
-            box-shadow: var(--shadow-md);
-            border-color: rgba(255, 255, 255, 0.3);
         }
 
         .card h2 {
@@ -955,10 +948,6 @@
             transition: all 0.2s ease;
         }
 
-        .supplement-card:active {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }
 
         .supplement-header {
             display: flex;
@@ -1284,21 +1273,154 @@
 
          /* Additional CSS for dynamic content */
          .weekly-summary {
-             background: #f9fafb;
+             background: var(--glass-bg);
+             border: 1px solid var(--glass-border);
              border-radius: 12px;
              padding: 20px;
          }
 
+         .weekly-table {
+             width: 100%;
+             border-collapse: collapse;
+             margin: 15px 0;
+             font-size: 0.95rem;
+         }
+         .weekly-table th, .weekly-table td {
+             padding: 10px 12px;
+             text-align: left;
+             border-bottom: 1px solid var(--glass-border);
+         }
+         .weekly-table th { color: var(--neutral-600); font-weight: 600; }
+         .weekly-table td { color: var(--neutral-800); }
+
+         .stat-grid { display: grid; gap: 10px; margin-top: 10px; }
          .stat-item {
              display: flex;
              justify-content: space-between;
              padding: 10px 0;
-             border-bottom: 1px solid #e5e7eb;
+             border-bottom: 1px solid var(--glass-border);
          }
+         .stat-item:last-child { border-bottom: none; }
 
-         .stat-item:last-child {
-             border-bottom: none;
+         .gesamt-stats {
+             display: grid;
+             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+             gap: 12px;
+             margin-bottom: 20px;
          }
+         .stat-card {
+             background: var(--glass-bg);
+             border: 1px solid var(--glass-border);
+             border-radius: var(--radius-lg);
+             padding: 15px;
+             text-align: center;
+         }
+         .stat-card .stat-value { display: block; font-size: 1.25rem; font-weight: 700; color: var(--primary-500); }
+         .stat-card .stat-label { font-size: 0.8rem; color: var(--neutral-600); }
+         .insight-list { margin: 15px 0; padding-left: 20px; color: var(--neutral-800); line-height: 1.6; }
+
+         .value-badge, .value-cell {
+             display: inline-block;
+             padding: 4px 10px;
+             border-radius: var(--radius-md);
+             font-weight: 600;
+             min-width: 28px;
+             text-align: center;
+         }
+         .weekly-table .value-cell { padding: 6px 10px; }
+         .weekly-table .no-data { color: var(--neutral-500); }
+
+         .calendar-filter {
+             display: flex;
+             gap: 8px;
+             flex-wrap: wrap;
+             margin-bottom: 15px;
+         }
+         .filter-metric {
+             padding: 8px 14px;
+             border-radius: var(--radius-lg);
+             border: 1px solid var(--glass-border);
+             background: var(--glass-bg);
+             color: var(--neutral-800);
+             font-weight: 500;
+             cursor: pointer;
+         }
+         .filter-metric.active { background: var(--primary-600); color: #fff; border-color: var(--primary-600); }
+         .filter-metric:hover:not(.active) { background: var(--neutral-200); }
+
+         .progress-calendar {
+             background: var(--glass-bg);
+             border: 1px solid var(--glass-border);
+             border-radius: var(--radius-xl);
+             padding: 12px;
+             margin: 0 auto 15px;
+             max-width: 280px;
+         }
+         .calendar-header {
+             display: flex;
+             align-items: center;
+             justify-content: space-between;
+             margin-bottom: 8px;
+             font-weight: 600;
+             font-size: 0.95rem;
+             color: var(--neutral-800);
+         }
+         .cal-nav {
+             background: var(--neutral-200);
+             border: none;
+             padding: 4px 10px;
+             border-radius: var(--radius-md);
+             cursor: pointer;
+             color: var(--neutral-800);
+             font-size: 0.9rem;
+         }
+         .cal-nav:hover { background: var(--neutral-300); }
+         .calendar-grid { display: flex; flex-direction: column; gap: 2px; }
+         .cal-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; min-height: 26px; }
+         .cal-row.cal-header span { font-size: 0.65rem; color: var(--neutral-600); font-weight: 600; text-align: center; }
+         .cal-cell {
+             height: 26px;
+             min-width: 0;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             font-size: 0.7rem;
+             font-weight: 500;
+             border-radius: 4px;
+         }
+         .cal-cell.cal-empty { background: transparent; color: transparent; }
+         .cal-legend {
+             display: flex;
+             align-items: center;
+             gap: 6px;
+             margin-top: 8px;
+             font-size: 0.7rem;
+             color: var(--neutral-600);
+         }
+         .cal-legend span { display: inline-block; width: 12px; height: 12px; border-radius: 3px; }
+        .calendar-multi {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+        }
+        .calendar-multi .progress-calendar {
+            max-width: none;
+            width: 100%;
+            margin: 0;
+        }
+        .calendar-metric-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--neutral-800);
+            text-align: center;
+        }
+        @media (max-width: 1100px) {
+            .calendar-multi { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (max-width: 640px) {
+            .calendar-multi { grid-template-columns: 1fr; }
+        }
 
          .insight-item {
              background: var(--glass-bg);
@@ -1681,9 +1803,9 @@
             <header class="screen-header">
                 <h1>📊 Progress</h1>
                 <div class="progress-tabs">
-                    <button class="tab-btn active" data-tab="daily">Daily</button>
-                    <button class="tab-btn" data-tab="weekly">Weekly</button>
-                    <button class="tab-btn" data-tab="insights">Insights</button>
+                    <button class="tab-btn active" data-tab="daily">Heute</button>
+                    <button class="tab-btn" data-tab="weekly">Woche</button>
+                    <button class="tab-btn" data-tab="gesamt">Gesamt</button>
                 </div>
             </header>
             
@@ -1695,19 +1817,23 @@
                         <div class="input-group">
                             <label>Energie Level (1-10)</label>
                             <input type="range" id="energy-level" min="1" max="10" value="5">
-                            <span id="energy-value">5</span>
+                            <span id="energy-value" class="value-badge">5</span>
                         </div>
                         <div class="input-group">
                             <label>Schlafqualität (1-10)</label>
                             <input type="range" id="sleep-quality" min="1" max="10" value="5">
-                            <span id="sleep-value">5</span>
+                            <span id="sleep-value" class="value-badge">5</span>
                         </div>
                         <div class="input-group">
                             <label>Stimmung (1-10)</label>
                             <input type="range" id="mood-level" min="1" max="10" value="5">
-                            <span id="mood-value">5</span>
+                            <span id="mood-value" class="value-badge">5</span>
                         </div>
-                        <button id="save-daily" class="btn-primary">Speichern</button>
+                        <div class="input-group">
+                            <label>Sport / Bewegung (1-10)</label>
+                            <input type="range" id="sport-level" min="1" max="10" value="5">
+                            <span id="sport-value" class="value-badge">5</span>
+                        </div>
                     </div>
                 </div>
 
@@ -1719,11 +1845,11 @@
                     </div>
                 </div>
 
-                <!-- Insights Tab -->
-                <div id="insights-tab" class="tab-content hidden">
-                    <div class="insights">
-                        <h3>Insights & Trends</h3>
-                        <div id="insights-content"></div>
+                <!-- Gesamt Tab -->
+                <div id="gesamt-tab" class="tab-content hidden">
+                    <div class="progress-overview">
+                        <h3>Gesamtübersicht</h3>
+                        <div id="gesamt-content"></div>
                     </div>
                 </div>
             </div>
@@ -1829,8 +1955,10 @@
     </div>
 
     <script>
-        // Backend-URL (für API und Push)
-        const BACKEND_URL = window.location.protocol === 'https:' ? 'https://lifeoptima-push.herokuapp.com' : 'http://localhost:4000';
+        // Backend-URL: lokal = localhost:4000, Netlify = gleiche Origin (API via Functions)
+        const BACKEND_URL = window.location.hostname === 'localhost'
+            ? 'http://localhost:4000'
+            : window.location.origin;
 
         // App State
         const AppState = {
@@ -1854,7 +1982,8 @@
             dailyData: {
                 energy: 5,
                 sleep: 5,
-                mood: 5
+                mood: 5,
+                sport: 5
             },
             supplements: [],
             mySupplements: [],
@@ -1866,6 +1995,7 @@
             currentTipIndex: 0,
             supplementNotifications: {}
         };
+        let dailyProgressSaveTimeout = null;
 
         // Scientific data
         const SUPPLEMENTS_DATA = [
@@ -2234,6 +2364,12 @@
                 }
                 if (Array.isArray(data.dailyHistory)) {
                     localStorage.setItem('dailyHistory', JSON.stringify(data.dailyHistory));
+                    const today = new Date().toISOString().split('T')[0];
+                    const todayEntry = data.dailyHistory.find(d => d.date === today);
+                    if (todayEntry) {
+                        AppState.dailyData = { energy: todayEntry.energy ?? 5, sleep: todayEntry.sleep ?? 5, mood: todayEntry.mood ?? 5, sport: todayEntry.sport ?? 5, date: today };
+                        if (document.getElementById('energy-level')) updateDailyInputs();
+                    }
                 }
             } catch (err) {
                 console.error('fetchUserData:', err);
@@ -2269,8 +2405,13 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
                 });
-                const data = await res.json().catch(() => ({}));
-                if (!res.ok) { showAuthMessage(data.error || 'Anmeldung fehlgeschlagen', true); return; }
+                const text = await res.text();
+                let data = {};
+                try { data = JSON.parse(text); } catch (_) {}
+                if (!res.ok) {
+                    showAuthMessage(data.error || 'Anmeldung fehlgeschlagen (Server: ' + res.status + ')', true);
+                    return;
+                }
                 setAuth(data.token, data.user);
                 await fetchUserData();
                 showAuthMessage('Angemeldet. Daten geladen.', false);
@@ -2279,7 +2420,8 @@
                 updateStepsDisplay();
                 renderGoals(); updateWaterDisplay(); updateBMI(); updateDailyInputs(); renderSchedule(); renderMySupplements();
             } catch (err) {
-                showAuthMessage('Netzwerkfehler.', true);
+                console.error('Login error:', err);
+                showAuthMessage('Netzwerkfehler. Backend erreichbar? ' + (err.message || ''), true);
             }
         }
 
@@ -2295,13 +2437,16 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
                 });
-                const data = await res.json().catch(() => ({}));
-                if (!res.ok) { showAuthMessage(data.error || 'Registrierung fehlgeschlagen', true); return; }
+                const text = await res.text();
+                let data = {};
+                try { data = JSON.parse(text); } catch (_) {}
+                if (!res.ok) { showAuthMessage(data.error || 'Registrierung fehlgeschlagen (Server: ' + res.status + ')', true); return; }
                 setAuth(data.token, data.user);
                 syncToServer();
                 showAuthMessage('Konto erstellt. Lokale Daten werden hochgeladen.', false);
             } catch (err) {
-                showAuthMessage('Netzwerkfehler.', true);
+                console.error('Register error:', err);
+                showAuthMessage('Netzwerkfehler. Backend erreichbar? ' + (err.message || ''), true);
             }
         }
 
@@ -2637,7 +2782,7 @@
             document.getElementById('energy-level').addEventListener('input', updateSliderValue);
             document.getElementById('sleep-quality').addEventListener('input', updateSliderValue);
             document.getElementById('mood-level').addEventListener('input', updateSliderValue);
-            document.getElementById('save-daily').addEventListener('click', saveDailyProgress);
+            document.getElementById('sport-level').addEventListener('input', updateSliderValue);
 
             // Profile inputs
             document.getElementById('user-height').addEventListener('input', updateBMI);
@@ -3018,114 +3163,243 @@
             
             if (tab === 'weekly') {
                 renderWeeklyStats();
-            } else if (tab === 'insights') {
-                renderInsights();
+            } else if (tab === 'gesamt') {
+                renderGesamtOverview();
             }
+        }
+
+        function getValueColor(val) {
+            if (val == null || val === '–' || val === '') return 'var(--neutral-500)';
+            const n = parseInt(val, 10);
+            if (isNaN(n) || n < 1 || n > 10) return 'var(--neutral-500)';
+            const t = (n - 1) / 9;
+            const r = Math.round(220 - t * 198);
+            const g = Math.round(38 + t * 125);
+            const b = Math.round(38 + t * 36);
+            return `rgb(${r},${g},${b})`;
         }
 
         function updateSliderValue(e) {
             const value = e.target.value;
-            const valueSpan = document.getElementById(e.target.id.replace('-level', '-value').replace('-quality', '-value'));
+            const id = e.target.id;
+            const valueSpan = document.getElementById(id.replace('-level', '-value').replace('-quality', '-value'));
             if (valueSpan) {
                 valueSpan.textContent = value;
+                valueSpan.style.backgroundColor = getValueColor(value);
+                valueSpan.style.color = parseInt(value) <= 4 ? '#fff' : '#000';
             }
+            if (dailyProgressSaveTimeout) clearTimeout(dailyProgressSaveTimeout);
+            dailyProgressSaveTimeout = setTimeout(() => saveDailyProgress(false), 300);
         }
 
-        function saveDailyProgress() {
+        function saveDailyProgress(showToast = true) {
+            const today = new Date().toISOString().split('T')[0];
             AppState.dailyData = {
                 energy: parseInt(document.getElementById('energy-level').value),
                 sleep: parseInt(document.getElementById('sleep-quality').value),
                 mood: parseInt(document.getElementById('mood-level').value),
-                date: new Date().toISOString().split('T')[0]
+                sport: parseInt(document.getElementById('sport-level').value),
+                date: today
             };
             
-            // Save to history
+            // History: genau ein Eintrag pro Tag (Update bestehendes oder neu hinzufügen)
             const history = JSON.parse(localStorage.getItem('dailyHistory') || '[]');
-            history.push(AppState.dailyData);
-            localStorage.setItem('dailyHistory', JSON.stringify(history));
+            const withoutToday = history.filter(d => d.date !== today);
+            withoutToday.push(AppState.dailyData);
+            withoutToday.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+            localStorage.setItem('dailyHistory', JSON.stringify(withoutToday));
             
             saveToStorage();
-            showNotification('✅ Täglicher Fortschritt gespeichert!');
+            if (showToast) showNotification('✅ Täglicher Fortschritt gespeichert!');
         }
 
         function updateDailyInputs() {
-            document.getElementById('energy-level').value = AppState.dailyData.energy;
-            document.getElementById('sleep-quality').value = AppState.dailyData.sleep;
-            document.getElementById('mood-level').value = AppState.dailyData.mood;
-            document.getElementById('energy-value').textContent = AppState.dailyData.energy;
-            document.getElementById('sleep-value').textContent = AppState.dailyData.sleep;
-            document.getElementById('mood-value').textContent = AppState.dailyData.mood;
+            const d = AppState.dailyData || {};
+            ['energy','sleep','mood','sport'].forEach(key => {
+                const el = document.getElementById(key === 'sleep' ? 'sleep-quality' : `${key}-level`);
+                const valEl = document.getElementById(key === 'sleep' ? 'sleep-value' : `${key}-value`);
+                const v = d[key] ?? 5;
+                if (el) el.value = v;
+                if (valEl) {
+                    valEl.textContent = v;
+                    valEl.style.backgroundColor = getValueColor(v);
+                    valEl.style.color = v <= 4 ? '#fff' : '#000';
+                }
+            });
+        }
+
+        function getWeekDates() {
+            const dates = [];
+            const d = new Date();
+            for (let i = 6; i >= 0; i--) {
+                const x = new Date(d);
+                x.setDate(x.getDate() - i);
+                dates.push(x.toISOString().split('T')[0]);
+            }
+            return dates;
         }
 
         function renderWeeklyStats() {
             const history = JSON.parse(localStorage.getItem('dailyHistory') || '[]');
-            const lastWeek = history.slice(-7);
+            const weekDates = getWeekDates();
+            const byDate = {};
+            history.forEach(h => { if (h.date) byDate[h.date] = h; });
+            const weekData = weekDates.map(date => ({ date, ...(byDate[date] || {}) })).filter(d => d.energy !== undefined || d.sleep !== undefined || d.mood !== undefined || d.sport !== undefined);
+            const hasData = weekData.length > 0;
             
             const container = document.getElementById('weekly-charts');
-            if (lastWeek.length === 0) {
-                container.innerHTML = '<p>Noch keine Daten für diese Woche vorhanden.</p>';
-                return;
-            }
+            const dayNames = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
             
-            const avgEnergy = lastWeek.reduce((sum, day) => sum + day.energy, 0) / lastWeek.length;
-            const avgSleep = lastWeek.reduce((sum, day) => sum + day.sleep, 0) / lastWeek.length;
-            const avgMood = lastWeek.reduce((sum, day) => sum + day.mood, 0) / lastWeek.length;
+            const cell = (val) => {
+                if (val == null || val === '–') return '<td class="no-data">–</td>';
+                const c = getValueColor(val);
+                return `<td class="value-cell" style="background:${c};color:${val<=4?'#fff':'#000'}">${val}</td>`;
+            };
+            const dayRows = weekDates.map(date => {
+                const d = byDate[date] || {};
+                const day = new Date(date + 'T12:00:00');
+                const name = dayNames[day.getDay()];
+                const short = date.slice(5);
+                return `<tr><td>${name} ${short}</td>${cell(d.energy)}${cell(d.sleep)}${cell(d.mood)}${cell(d.sport)}</tr>`;
+            }).join('');
+            
+            const enLen = weekData.filter(d => d.energy != null).length;
+            const slLen = weekData.filter(d => d.sleep != null).length;
+            const moLen = weekData.filter(d => d.mood != null).length;
+            const spLen = weekData.filter(d => d.sport != null).length;
+            const avgEnergy = enLen ? (weekData.reduce((s, d) => s + (d.energy || 0), 0) / enLen).toFixed(1) : '–';
+            const avgSleep = slLen ? (weekData.reduce((s, d) => s + (d.sleep || 0), 0) / slLen).toFixed(1) : '–';
+            const avgMood = moLen ? (weekData.reduce((s, d) => s + (d.mood || 0), 0) / moLen).toFixed(1) : '–';
+            const avgSport = spLen ? (weekData.reduce((s, d) => s + (d.sport || 0), 0) / spLen).toFixed(1) : '–';
             
             container.innerHTML = `
                 <div class="weekly-summary">
-                    <h4>Wochendurchschnitt</h4>
-                    <div class="stat-item">
-                        <span>Energie:</span>
-                        <span>${avgEnergy.toFixed(1)}/10</span>
-                    </div>
-                    <div class="stat-item">
-                        <span>Schlaf:</span>
-                        <span>${avgSleep.toFixed(1)}/10</span>
-                    </div>
-                    <div class="stat-item">
-                        <span>Stimmung:</span>
-                        <span>${avgMood.toFixed(1)}/10</span>
+                    <h4>Letzte 7 Tage</h4>
+                    <table class="weekly-table">
+                        <thead><tr><th>Tag</th><th>Energie</th><th>Schlaf</th><th>Stimmung</th><th>Sport</th></tr></thead>
+                        <tbody>${dayRows}</tbody>
+                    </table>
+                    <h4>Durchschnitt (nur Tage mit Eintrag)</h4>
+                    <div class="stat-grid">
+                        <div class="stat-item"><span>Energie:</span><span class="value-cell" style="background:${getValueColor(avgEnergy)}">${avgEnergy}/10</span></div>
+                        <div class="stat-item"><span>Schlaf:</span><span class="value-cell" style="background:${getValueColor(avgSleep)}">${avgSleep}/10</span></div>
+                        <div class="stat-item"><span>Stimmung:</span><span class="value-cell" style="background:${getValueColor(avgMood)}">${avgMood}/10</span></div>
+                        <div class="stat-item"><span>Sport:</span><span class="value-cell" style="background:${getValueColor(avgSport)}">${avgSport}/10</span></div>
                     </div>
                 </div>
             `;
         }
 
-        function renderInsights() {
-            const history = JSON.parse(localStorage.getItem('dailyHistory') || '[]');
-            const container = document.getElementById('insights-content');
-            
-            if (history.length < 3) {
-                container.innerHTML = '<p>Sammle mindestens 3 Tage Daten für erste Insights.</p>';
-                return;
-            }
-            
-            const insights = generateInsights(history);
-            container.innerHTML = insights.map(insight => `
-                <div class="insight-item">
-                    <h4>${insight.title}</h4>
-                    <p>${insight.description}</p>
-                </div>
-            `).join('');
-        }
+        let progressCalendarMonth = new Date().getMonth();
+        let progressCalendarYear = new Date().getFullYear();
 
-        function generateInsights(history) {
+        function renderGesamtOverview() {
+            const history = JSON.parse(localStorage.getItem('dailyHistory') || '[]');
+            const container = document.getElementById('gesamt-content');
+            const byDate = {};
+            history.forEach(h => { if (h.date) byDate[h.date] = h; });
+            const sorted = Object.keys(byDate).sort();
+            const daysWithData = sorted.length;
+            
+            const metrics = [
+                { key: 'energy', label: 'Energie' },
+                { key: 'sleep', label: 'Schlaf' },
+                { key: 'mood', label: 'Stimmung' },
+                { key: 'sport', label: 'Sport' }
+            ];
+            
+            const avg = (key) => {
+                const arr = sorted.map(d => byDate[d]).filter(x => x[key] != null);
+                return arr.length ? (arr.reduce((s, d) => s + d[key], 0) / arr.length).toFixed(1) : '–';
+            };
+            const avgEnergy = avg('energy');
+            const avgSleep = avg('sleep');
+            const avgMood = avg('mood');
+            const avgSport = avg('sport');
+            const first = sorted[0] || '–';
+            const last = sorted[sorted.length - 1] || '–';
+            
             const insights = [];
-            const recent = history.slice(-7);
-            const avgEnergy = recent.reduce((sum, day) => sum + day.energy, 0) / recent.length;
+            if (parseFloat(avgEnergy) >= 7) insights.push({ icon: '🔥', text: 'Hohes Energielevel – Gewohnheiten beibehalten.' });
+            else if (parseFloat(avgEnergy) < 5) insights.push({ icon: '⚠️', text: 'Niedrige Energie – Schlaf, Ernährung und Stress prüfen.' });
+            if (parseFloat(avgSleep) < 5) insights.push({ icon: '😴', text: 'Schlafqualität verbessern – z.B. Magnesium, Bildschirm reduzieren.' });
+            if (parseFloat(avgMood) >= 7) insights.push({ icon: '😊', text: 'Stabile Stimmung – gut unterwegs!' });
+            else if (parseFloat(avgMood) < 5) insights.push({ icon: '💭', text: 'Stimmung niedrig – Bewegung und soziale Kontakte helfen oft.' });
+            if (parseFloat(avgSport) < 5 && daysWithData > 0) insights.push({ icon: '🏃', text: 'Mehr Sport könnte Energie und Stimmung steigern.' });
             
-            if (avgEnergy >= 7) {
-                insights.push({
-                    title: '🔥 Hohes Energielevel',
-                    description: 'Dein Energielevel ist konstant hoch! Behalte deine aktuellen Gewohnheiten bei.'
-                });
-            } else if (avgEnergy < 5) {
-                insights.push({
-                    title: '⚠️ Niedriges Energielevel',
-                    description: 'Überprüfe deine Schlafqualität, Ernährung und Stresslevel. Mehr Bewegung könnte helfen.'
-                });
-            }
+            const monthNames = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+            const dayNames = ['Mo','Di','Mi','Do','Fr','Sa','So'];
+            const year = progressCalendarYear;
+            const month = progressCalendarMonth;
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startOffset = (firstDay.getDay() + 6) % 7;
+            const daysInMonth = lastDay.getDate();
+            const buildCalendarForMetric = (metricKey, metricLabel) => {
+                let calHtml = `<div class="progress-calendar"><div class="calendar-metric-title">${metricLabel}</div>`;
+                calHtml += '<div class="calendar-grid"><div class="cal-row cal-header">' + dayNames.map(d => `<span>${d}</span>`).join('') + '</div>';
+                let day = 1;
+                let rows = '';
+                for (let w = 0; w < 6; w++) {
+                    let cells = '';
+                    for (let d = 0; d < 7; d++) {
+                        const idx = w * 7 + d;
+                        if (idx < startOffset || day > daysInMonth) {
+                            cells += '<span class="cal-cell cal-empty"></span>';
+                        } else {
+                            const dateStr = year + '-' + String(month + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+                            const data = byDate[dateStr];
+                            const val = data ? data[metricKey] : null;
+                            const bg = val != null ? getValueColor(val) : 'var(--neutral-200)';
+                            const fg = val != null && val <= 4 ? '#fff' : (val != null ? '#000' : 'var(--neutral-500)');
+                            cells += `<span class="cal-cell" style="background:${bg};color:${fg}" title="${metricLabel} ${dateStr}${val != null ? ': ' + val + '/10' : ''}">${day}</span>`;
+                            day++;
+                        }
+                    }
+                    rows += '<div class="cal-row">' + cells + '</div>';
+                }
+                calHtml += rows + '</div></div>';
+                return calHtml;
+            };
             
-            return insights;
+            const statItem = (label, val) => {
+                const c = getValueColor(val);
+                return `<div class="stat-item"><span>${label}:</span><span class="value-cell" style="background:${c};color:${val!=='–'&&parseFloat(val)<=4?'#fff':'inherit'}">${val}/10</span></div>`;
+            };
+            
+            container.innerHTML = `
+                <div class="calendar-header">
+                    <button type="button" class="cal-nav" data-dir="-1">←</button>
+                    <span>${monthNames[month]} ${year}</span>
+                    <button type="button" class="cal-nav" data-dir="1">→</button>
+                </div>
+                <div class="calendar-multi">
+                    ${metrics.map(m => buildCalendarForMetric(m.key, m.label)).join('')}
+                </div>
+                <p class="cal-legend"><span style="background:rgb(220,38,38)"></span> 1 ····· <span style="background:rgb(22,163,74)"></span> 10</p>
+                <div class="gesamt-stats">
+                    <div class="stat-card"><span class="stat-value">${daysWithData}</span><span class="stat-label">Tage erfasst</span></div>
+                    <div class="stat-card"><span class="stat-value">${first}</span><span class="stat-label">Erster Eintrag</span></div>
+                    <div class="stat-card"><span class="stat-value">${last}</span><span class="stat-label">Letzter Eintrag</span></div>
+                </div>
+                <h4>Gesamtdurchschnitt</h4>
+                <div class="stat-grid">
+                    ${statItem('Energie', avgEnergy)}
+                    ${statItem('Schlaf', avgSleep)}
+                    ${statItem('Stimmung', avgMood)}
+                    ${statItem('Sport', avgSport)}
+                </div>
+                ${insights.length ? '<h4>Insights</h4><ul class="insight-list">' + insights.map(i => `<li>${i.icon} ${i.text}</li>`).join('') + '</ul>' : ''}
+            `;
+            container.querySelectorAll('.cal-nav').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const d = parseInt(btn.dataset.dir, 10);
+                    progressCalendarMonth += d;
+                    if (progressCalendarMonth > 11) { progressCalendarMonth = 0; progressCalendarYear++; }
+                    if (progressCalendarMonth < 0) { progressCalendarMonth = 11; progressCalendarYear--; }
+                    renderGesamtOverview();
+                });
+            });
         }
 
         // Profile
@@ -3270,17 +3544,24 @@
 
         function loadFromStorage() {
             const saved = localStorage.getItem('lifeOptima');
+            const today = new Date().toISOString().split('T')[0];
+            const history = JSON.parse(localStorage.getItem('dailyHistory') || '[]');
+            const todayEntry = history.find(d => d.date === today);
+
             if (saved) {
                 const data = JSON.parse(saved);
                 Object.assign(AppState, data);
                 
-                // Reset daily data if new day
-                const today = new Date().toISOString().split('T')[0];
-                if (!AppState.dailyData.date || AppState.dailyData.date !== today) {
+                if (!AppState.dailyData || !AppState.dailyData.date || AppState.dailyData.date !== today) {
                     AppState.waterIntake = 0;
-                    AppState.dailyData = { energy: 5, sleep: 5, mood: 5, date: today };
+                    if (todayEntry) {
+                        AppState.dailyData = { energy: todayEntry.energy ?? 5, sleep: todayEntry.sleep ?? 5, mood: todayEntry.mood ?? 5, sport: todayEntry.sport ?? 5, date: today };
+                    } else {
+                        AppState.dailyData = { energy: 5, sleep: 5, mood: 5, sport: 5, date: today };
+                    }
+                } else if (todayEntry) {
+                    AppState.dailyData = { ...AppState.dailyData, ...todayEntry, date: today };
                 }
-                
                 // Check if tip should be reset for new day
                 const lastTipDate = localStorage.getItem('lifeOptima_tipDate');
                 if (lastTipDate !== today) {

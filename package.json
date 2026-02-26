@@ -1,0 +1,10 @@
+{
+  "name": "lifeoptima",
+  "scripts": {
+    "heroku-postbuild": "cd backend && npm install",
+    "start": "cd backend && node server.js"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}

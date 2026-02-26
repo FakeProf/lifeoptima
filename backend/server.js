@@ -17,13 +17,23 @@ const JWT_SECRET = process.env.JWT_SECRET || 'lifeoptima-dev-secret';
 // Google Fit OAuth Config
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || '';
-const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI || `http://localhost:4000/api/google-fit/callback`;
+const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI ||
+    (process.env.URL ? `${process.env.URL}/api/google-fit/callback` : 'http://localhost:4000/api/google-fit/callback');
 
 const oauth2Client = new google.auth.OAuth2(
     GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET,
     GOOGLE_REDIRECT_URI
 );
+
+// Netlify: Pfad /.netlify/functions/api/* → /api/* für Express-Routing
+app.use((req, res, next) => {
+    if (req.path.startsWith('/.netlify/functions/api')) {
+        const rest = req.path.replace('/.netlify/functions/api', '') || '/';
+        req.url = '/api' + rest + (req.url.includes('?') ? '?' + req.url.split('?')[1] : '');
+    }
+    next();
+});
 
 // CORS für Frontend-Integration
 app.use((req, res, next) => {
@@ -305,14 +315,18 @@ app.delete('/api/google-fit/disconnect', authMiddleware, async (req, res) => {
     }
 });
 
-// VAPID Keys laden oder generieren
-const vapidPath = path.join(__dirname, 'vapid.json');
+// VAPID Keys: Env (Netlify) oder Datei (lokal)
 let vapidKeys;
-if (fs.existsSync(vapidPath)) {
-    vapidKeys = JSON.parse(fs.readFileSync(vapidPath));
+if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
+    vapidKeys = { publicKey: process.env.VAPID_PUBLIC_KEY, privateKey: process.env.VAPID_PRIVATE_KEY };
 } else {
-    vapidKeys = webpush.generateVAPIDKeys();
-    fs.writeFileSync(vapidPath, JSON.stringify(vapidKeys));
+    const vapidPath = path.join(__dirname, 'vapid.json');
+    if (fs.existsSync(vapidPath)) {
+        vapidKeys = JSON.parse(fs.readFileSync(vapidPath));
+    } else {
+        vapidKeys = webpush.generateVAPIDKeys();
+        try { fs.writeFileSync(vapidPath, JSON.stringify(vapidKeys)); } catch (_) {}
+    }
 }
 
 webpush.setVapidDetails(
@@ -461,6 +475,9 @@ app.get('/vapidPublicKey', (req, res) => {
     res.json({ publicKey: vapidKeys.publicKey });
 });
 
-app.listen(PORT, () => {
-    console.log(`Push-Server läuft auf Port ${PORT}`);
-}); 
+module.exports = app;
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`Push-Server läuft auf Port ${PORT}`);
+    });
+} 

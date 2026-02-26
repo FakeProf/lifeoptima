@@ -1,0 +1,15 @@
+# LifeOptima - Netlify Konfiguration
+[build]
+  publish = "."
+  command = "cd backend && npm install"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+  external_node_modules = ["pg", "bcryptjs", "jsonwebtoken", "googleapis", "web-push", "node-cron"]
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+  force = true
