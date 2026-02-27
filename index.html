@@ -1815,6 +1815,11 @@
                     <div class="daily-input">
                         <h3>Heutiger Status</h3>
                         <div class="input-group">
+                            <label>Sport / Bewegung (1-10)</label>
+                            <input type="range" id="sport-level" min="1" max="10" value="5">
+                            <span id="sport-value" class="value-badge">5</span>
+                        </div>
+                        <div class="input-group">
                             <label>Energie Level (1-10)</label>
                             <input type="range" id="energy-level" min="1" max="10" value="5">
                             <span id="energy-value" class="value-badge">5</span>
@@ -1828,11 +1833,6 @@
                             <label>Stimmung (1-10)</label>
                             <input type="range" id="mood-level" min="1" max="10" value="5">
                             <span id="mood-value" class="value-badge">5</span>
-                        </div>
-                        <div class="input-group">
-                            <label>Sport / Bewegung (1-10)</label>
-                            <input type="range" id="sport-level" min="1" max="10" value="5">
-                            <span id="sport-value" class="value-badge">5</span>
                         </div>
                     </div>
                 </div>
@@ -3215,7 +3215,7 @@
 
         function updateDailyInputs() {
             const d = AppState.dailyData || {};
-            ['energy','sleep','mood','sport'].forEach(key => {
+            ['sport','energy','sleep','mood'].forEach(key => {
                 const el = document.getElementById(key === 'sleep' ? 'sleep-quality' : `${key}-level`);
                 const valEl = document.getElementById(key === 'sleep' ? 'sleep-value' : `${key}-value`);
                 const v = d[key] ?? 5;
@@ -3244,8 +3244,15 @@
             const weekDates = getWeekDates();
             const byDate = {};
             history.forEach(h => { if (h.date) byDate[h.date] = h; });
-            const weekData = weekDates.map(date => ({ date, ...(byDate[date] || {}) })).filter(d => d.energy !== undefined || d.sleep !== undefined || d.mood !== undefined || d.sport !== undefined);
-            const hasData = weekData.length > 0;
+            const metrics = [
+                { key: 'sport', label: 'Sport' },
+                { key: 'energy', label: 'Energie' },
+                { key: 'sleep', label: 'Schlaf' },
+                { key: 'mood', label: 'Stimmung' }
+            ];
+            const weekData = weekDates
+                .map(date => ({ date, ...(byDate[date] || {}) }))
+                .filter(d => metrics.some(m => d[m.key] !== undefined));
             
             const container = document.getElementById('weekly-charts');
             const dayNames = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
@@ -3260,32 +3267,31 @@
                 const day = new Date(date + 'T12:00:00');
                 const name = dayNames[day.getDay()];
                 const short = date.slice(5);
-                return `<tr><td>${name} ${short}</td>${cell(d.energy)}${cell(d.sleep)}${cell(d.mood)}${cell(d.sport)}</tr>`;
+                const metricCells = metrics.map(m => cell(d[m.key])).join('');
+                return `<tr><td>${name} ${short}</td>${metricCells}</tr>`;
             }).join('');
             
-            const enLen = weekData.filter(d => d.energy != null).length;
-            const slLen = weekData.filter(d => d.sleep != null).length;
-            const moLen = weekData.filter(d => d.mood != null).length;
-            const spLen = weekData.filter(d => d.sport != null).length;
-            const avgEnergy = enLen ? (weekData.reduce((s, d) => s + (d.energy || 0), 0) / enLen).toFixed(1) : '–';
-            const avgSleep = slLen ? (weekData.reduce((s, d) => s + (d.sleep || 0), 0) / slLen).toFixed(1) : '–';
-            const avgMood = moLen ? (weekData.reduce((s, d) => s + (d.mood || 0), 0) / moLen).toFixed(1) : '–';
-            const avgSport = spLen ? (weekData.reduce((s, d) => s + (d.sport || 0), 0) / spLen).toFixed(1) : '–';
+            const avgByMetric = {};
+            metrics.forEach(m => {
+                const len = weekData.filter(d => d[m.key] != null).length;
+                avgByMetric[m.key] = len
+                    ? (weekData.reduce((s, d) => s + (d[m.key] || 0), 0) / len).toFixed(1)
+                    : '–';
+            });
+            const headerCells = metrics.map(m => `<th>${m.label}</th>`).join('');
+            const statRows = metrics.map(m =>
+                `<div class="stat-item"><span>${m.label}:</span><span class="value-cell" style="background:${getValueColor(avgByMetric[m.key])}">${avgByMetric[m.key]}/10</span></div>`
+            ).join('');
             
             container.innerHTML = `
                 <div class="weekly-summary">
                     <h4>Letzte 7 Tage</h4>
                     <table class="weekly-table">
-                        <thead><tr><th>Tag</th><th>Energie</th><th>Schlaf</th><th>Stimmung</th><th>Sport</th></tr></thead>
+                        <thead><tr><th>Tag</th>${headerCells}</tr></thead>
                         <tbody>${dayRows}</tbody>
                     </table>
                     <h4>Durchschnitt (nur Tage mit Eintrag)</h4>
-                    <div class="stat-grid">
-                        <div class="stat-item"><span>Energie:</span><span class="value-cell" style="background:${getValueColor(avgEnergy)}">${avgEnergy}/10</span></div>
-                        <div class="stat-item"><span>Schlaf:</span><span class="value-cell" style="background:${getValueColor(avgSleep)}">${avgSleep}/10</span></div>
-                        <div class="stat-item"><span>Stimmung:</span><span class="value-cell" style="background:${getValueColor(avgMood)}">${avgMood}/10</span></div>
-                        <div class="stat-item"><span>Sport:</span><span class="value-cell" style="background:${getValueColor(avgSport)}">${avgSport}/10</span></div>
-                    </div>
+                    <div class="stat-grid">${statRows}</div>
                 </div>
             `;
         }
