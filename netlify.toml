@@ -1,7 +1,7 @@
 # LifeOptima - Netlify Konfiguration
 [build]
   publish = "."
-  command = "cd backend && npm install"
+  command = "npm run build"
 
 [functions]
   directory = "netlify/functions"
