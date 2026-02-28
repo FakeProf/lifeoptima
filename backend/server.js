@@ -26,6 +26,29 @@ const oauth2Client = new google.auth.OAuth2(
     GOOGLE_REDIRECT_URI
 );
 
+const SCHEMA_SQL = `
+CREATE TABLE IF NOT EXISTS users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE TABLE IF NOT EXISTS user_data (
+    user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    app_state JSONB NOT NULL DEFAULT '{}',
+    daily_history JSONB NOT NULL DEFAULT '[]',
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE TABLE IF NOT EXISTS google_fit_tokens (
+    user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    access_token TEXT NOT NULL,
+    refresh_token TEXT,
+    expires_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+`;
+
 let dbReadyPromise = null;
 async function ensureDbReady() {
     if (!process.env.DATABASE_URL) {
@@ -33,11 +56,8 @@ async function ensureDbReady() {
     }
     if (!dbReadyPromise) {
         dbReadyPromise = (async () => {
-            const schemaPath = path.join(__dirname, 'db', 'schema.sql');
-            const sql = fs.readFileSync(schemaPath, 'utf8');
-            await pool.query(sql);
+            await pool.query(SCHEMA_SQL);
         })().catch((err) => {
-            // Bei Fehlern erneute Versuche erlauben
             dbReadyPromise = null;
             throw err;
         });
@@ -106,6 +126,7 @@ app.post('/api/auth/register', async (req, res) => {
         res.status(201).json({ user: { id: user.id, email: user.email }, token });
     } catch (err) {
         if (err.code === '23505') return res.status(409).json({ error: 'E-Mail bereits registriert' });
+        if (err.message === 'DATABASE_URL fehlt') return res.status(503).json({ error: 'Server nicht konfiguriert (DATABASE_URL fehlt)' });
         console.error('Register error:', err);
         res.status(500).json({ error: 'Registrierung fehlgeschlagen' });
     }
@@ -129,6 +150,7 @@ app.post('/api/auth/login', async (req, res) => {
         const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '30d' });
         res.json({ user: { id: user.id, email: user.email }, token });
     } catch (err) {
+        if (err.message === 'DATABASE_URL fehlt') return res.status(503).json({ error: 'Server nicht konfiguriert (DATABASE_URL fehlt)' });
         console.error('Login error:', err);
         res.status(500).json({ error: 'Anmeldung fehlgeschlagen' });
     }
