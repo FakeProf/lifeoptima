@@ -396,6 +396,21 @@ app.get('/api/health', (req, res) => {
     });
 });
 
+// DB-Verbindungstest (Diagnose)
+app.get('/api/test-db', async (req, res) => {
+    const dbUrl = process.env.DATABASE_URL || process.env.NETLIFY_DATABASE_URL;
+    if (!dbUrl) {
+        return res.status(503).json({ ok: false, error: 'DATABASE_URL/NETLIFY_DATABASE_URL fehlt' });
+    }
+    try {
+        await pool.query('SELECT 1 as ok');
+        res.json({ ok: true, message: 'DB-Verbindung OK' });
+    } catch (err) {
+        console.error('test-db error:', err);
+        res.status(500).json({ ok: false, error: err.message || 'DB-Verbindung fehlgeschlagen' });
+    }
+});
+
 // Statische Dateien servieren (für Frontend) - NACH allen API-Routen
 app.use(express.static(path.join(__dirname, '..')));
 
