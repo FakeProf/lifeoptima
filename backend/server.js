@@ -51,7 +51,8 @@ CREATE TABLE IF NOT EXISTS google_fit_tokens (
 
 let dbReadyPromise = null;
 async function ensureDbReady() {
-    if (!process.env.DATABASE_URL) {
+    const dbUrl = process.env.DATABASE_URL || process.env.NETLIFY_DATABASE_URL;
+    if (!dbUrl) {
         throw new Error('DATABASE_URL fehlt');
     }
     if (!dbReadyPromise) {
@@ -391,7 +392,7 @@ app.get('/api/health', (req, res) => {
         service: 'LifeOptima Push Backend',
         timestamp: new Date().toISOString(),
         pushEnabled: true,
-        dbConfigured: !!process.env.DATABASE_URL
+        dbConfigured: !!(process.env.DATABASE_URL || process.env.NETLIFY_DATABASE_URL)
     });
 });
 
