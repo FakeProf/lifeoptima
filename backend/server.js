@@ -26,6 +26,25 @@ const oauth2Client = new google.auth.OAuth2(
     GOOGLE_REDIRECT_URI
 );
 
+let dbReadyPromise = null;
+async function ensureDbReady() {
+    if (!process.env.DATABASE_URL) {
+        throw new Error('DATABASE_URL fehlt');
+    }
+    if (!dbReadyPromise) {
+        dbReadyPromise = (async () => {
+            const schemaPath = path.join(__dirname, 'db', 'schema.sql');
+            const sql = fs.readFileSync(schemaPath, 'utf8');
+            await pool.query(sql);
+        })().catch((err) => {
+            // Bei Fehlern erneute Versuche erlauben
+            dbReadyPromise = null;
+            throw err;
+        });
+    }
+    return dbReadyPromise;
+}
+
 // Netlify: Pfad /.netlify/functions/api/* → /api/* für Express-Routing
 app.use((req, res, next) => {
     if (req.path.startsWith('/.netlify/functions/api')) {
@@ -72,6 +91,7 @@ app.post('/api/auth/register', async (req, res) => {
         return res.status(400).json({ error: 'E-Mail und Passwort (min. 6 Zeichen) erforderlich' });
     }
     try {
+        await ensureDbReady();
         const password_hash = await bcrypt.hash(password, 10);
         const result = await pool.query(
             'INSERT INTO users (email, password_hash) VALUES ($1, $2) RETURNING id, email, created_at',
@@ -98,6 +118,7 @@ app.post('/api/auth/login', async (req, res) => {
         return res.status(400).json({ error: 'E-Mail und Passwort erforderlich' });
     }
     try {
+        await ensureDbReady();
         const result = await pool.query('SELECT id, email, password_hash FROM users WHERE email = $1', [email.trim().toLowerCase()]);
         if (result.rows.length === 0) {
             return res.status(401).json({ error: 'E-Mail oder Passwort falsch' });
@@ -116,6 +137,7 @@ app.post('/api/auth/login', async (req, res) => {
 // Get my data (app state + daily history)
 app.get('/api/me/data', authMiddleware, async (req, res) => {
     try {
+        await ensureDbReady();
         const result = await pool.query(
             'SELECT app_state, daily_history FROM user_data WHERE user_id = $1',
             [req.userId]
@@ -141,6 +163,7 @@ app.put('/api/me/data', authMiddleware, async (req, res) => {
         return res.status(400).json({ error: 'appState oder dailyHistory erforderlich' });
     }
     try {
+        await ensureDbReady();
         if (appState !== undefined && dailyHistory !== undefined) {
             await pool.query(
                 `INSERT INTO user_data (user_id, app_state, daily_history, updated_at)
@@ -200,6 +223,7 @@ app.get('/api/google-fit/callback', async (req, res) => {
         return res.redirect('/?google-fit=error');
     }
     try {
+        await ensureDbReady();
         const { tokens } = await oauth2Client.getToken(code);
         oauth2Client.setCredentials(tokens);
         
@@ -222,6 +246,7 @@ app.get('/api/google-fit/callback', async (req, res) => {
 // Schrittzahl abrufen
 app.get('/api/google-fit/steps', authMiddleware, async (req, res) => {
     try {
+        await ensureDbReady();
         const tokenResult = await pool.query(
             'SELECT access_token, refresh_token, expires_at FROM google_fit_tokens WHERE user_id = $1',
             [req.userId]
@@ -295,6 +320,7 @@ app.get('/api/google-fit/steps', authMiddleware, async (req, res) => {
 // Google Fit Verbindung prüfen
 app.get('/api/google-fit/status', authMiddleware, async (req, res) => {
     try {
+        await ensureDbReady();
         const result = await pool.query(
             'SELECT expires_at FROM google_fit_tokens WHERE user_id = $1',
             [req.userId]
@@ -308,6 +334,7 @@ app.get('/api/google-fit/status', authMiddleware, async (req, res) => {
 // Google Fit Verbindung trennen
 app.delete('/api/google-fit/disconnect', authMiddleware, async (req, res) => {
     try {
+        await ensureDbReady();
         await pool.query('DELETE FROM google_fit_tokens WHERE user_id = $1', [req.userId]);
         res.json({ ok: true });
     } catch (err) {
@@ -341,7 +368,8 @@ app.get('/api/health', (req, res) => {
         status: 'OK', 
         service: 'LifeOptima Push Backend',
         timestamp: new Date().toISOString(),
-        pushEnabled: true
+        pushEnabled: true,
+        dbConfigured: !!process.env.DATABASE_URL
     });
 });
 
